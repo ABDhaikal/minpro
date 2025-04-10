@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 
+// Environment variables configuration
 dotenv.config();
 
-// Environment variables configuration
 export const PORT = process.env.PORT;
 
 // Database connection string
