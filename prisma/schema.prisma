@@ -8,31 +8,25 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  name      String?
-  email     String?  @unique
-  password  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model User {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  email        String    @unique
-  password     String
-  profile_pict String?
-  point        Int       @default(0)
-  role         Role      @default(USER)
-  reveral_code String    @default(cuid())
-  update_at    DateTime  @updatedAt
-  created_at   DateTime  @default(now())
-  delete_at    DateTime?
+  id          String    @id @default(cuid())
+  username    String    @unique
+  email       String    @unique
+  password    String
+  profilePict String?
+  point       Int       @default(0)
+  role        Role      @default(USER)
+  reveralCode String    @default(cuid())
+  updateAt    DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
 
   // relation
   transaction   Transaction[]
   cuponDiscount CuponDiscount[]
+  Review        Review[]
+  Cart          Cart[]
+  usersTickets  usersTickets[]
 
   @@map("users")
 }
@@ -44,20 +38,23 @@ enum Role {
 }
 
 model Transaction {
-  id               String            @id @default(uuid())
-  userId           String
-  status           TransactionStatus
-  points_used      Int
-  total_price      Int
-  payment_deadline DateTime
-  created_at       DateTime          @default(now())
-  updated_at       DateTime          @updatedAt
-  deleted_at       DateTime?
+  id              String            @id @default(uuid())
+  userId          String
+  status          TransactionStatus
+  pointsUsed      Int
+  totalPrice      Int
+  paymentDeadline DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  deletedAt       DateTime?
 
   // relation
-  users              User                @relation(fields: [userId], references: [id])
+  users              User                 @relation(fields: [userId], references: [id])
   notifications      Notification?
-  cupon_transactions Cupon_Transaction[]
+  cuponTransactions  CuponTransaction[]
+  voucherTransaction VoucherTransaction[]
+  transactionTicket  transactionTicket[]
+  Payment            Payment?
 
   @@map("transactions")
 }
@@ -72,33 +69,33 @@ enum TransactionStatus {
 }
 
 model Notification {
-  id             String   @id @default(uuid()) // Primary Key
-  transaction_id String   @unique
-  message        String
-  is_read        Boolean  @default(false) // Defaults to unread
-  created_at     DateTime @default(now())
+  id            String   @id @default(uuid()) // Primary Key
+  transactionId String   @unique
+  message       String
+  isRead        Boolean  @default(false) // Defaults to unread
+  createdAt     DateTime @default(now())
 
   // relation
-  transactions Transaction @relation(fields: [transaction_id], references: [id])
+  transactions Transaction @relation(fields: [transactionId], references: [id])
 
   @@map("notifications")
 }
 
 model CuponDiscount {
-  id         String       @id @default(uuid()) // Primary Key
-  user_id    String
-  type       DiscountType
-  amount     Int
-  expired_at DateTime
-  created_at DateTime     @default(now())
-  updated_at DateTime     @updatedAt
-  deleted_at DateTime?
+  id        String       @id @default(uuid()) // Primary Key
+  userId    String
+  type      DiscountType
+  amount    Int
+  expiredAt DateTime
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  deletedAt DateTime?
 
   // relation
-  users              User               @relation(fields: [user_id], references: [id])
-  cupon_transactions Cupon_Transaction?
+  users             User              @relation(fields: [userId], references: [id])
+  cuponTransactions CuponTransaction?
 
-  @@map("cupon_discounts")
+  @@map("cuponDiscounts")
 }
 
 enum DiscountType {
@@ -106,30 +103,30 @@ enum DiscountType {
   FIXED_AMOUNT
 }
 
-model Cupon_Transaction {
-  id             String   @id @default(uuid()) // Primary Key
-  cupon_id       String   @unique
-  transaction_id String
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+model CuponTransaction {
+  id            String   @id @default(uuid()) // Primary Key
+  cuponId       String   @unique
+  transactionId String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // relation
-  cupons       CuponDiscount @relation(fields: [cupon_id], references: [id])
-  transactions Transaction   @relation(fields: [transaction_id], references: [id])
+  cupons       CuponDiscount @relation(fields: [cuponId], references: [id])
+  transactions Transaction   @relation(fields: [transactionId], references: [id])
 
-  @@map("cupon_transactions")
+  @@map("cuponTransactions")
 }
 
 model Organizer {
-  id                String    @id @default(cuid()) //primary key
-  name              String
-  organizer_picture String?
-  description       String
-  bank_target       String
-  payment_target    String
-  updatedAt         DateTime  @updatedAt
-  createdAt         DateTime  @default(now())
-  deletedAt         DateTime?
+  id               String    @id @default(cuid()) //primary key
+  name             String
+  organizerPicture String?
+  description      String
+  bankTarget       String
+  paymentTarget    String
+  updatedAt        DateTime  @updatedAt
+  createdAt        DateTime  @default(now())
+  deletedAt        DateTime?
 
   //relation
   Event Event[]
@@ -147,18 +144,19 @@ model Event {
   slug        String    @unique
   description String
   location    String
-  event_start DateTime
-  event_end   DateTime
+  eventStart  DateTime
+  eventEnd    DateTime
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
   //relation
-  organizers    Organizer       @relation(fields: [organizerId], references: [id])
-  categories    Category        @relation(fields: [categoryId], references: [id])
-  Event_voucher Event_voucher[]
-  Image         Image[]
-  Ticket        Ticket[]
+  organizers   Organizer      @relation(fields: [organizerId], references: [id])
+  categories   Category       @relation(fields: [categoryId], references: [id])
+  EventVoucher EventVoucher[]
+  Image        Image[]
+  Ticket       Ticket[]
+  Review       Review[]
 
   @@map("events")
 }
@@ -202,12 +200,16 @@ model Ticket {
   deletedAt DateTime?
 
   //relation
-  events Event @relation(fields: [eventId], references: [id])
+  events            Event               @relation(fields: [eventId], references: [id])
+  transactionTicket transactionTicket[]
+  Review            Review[]
+  Cart              Cart[]
+  usersTickets      usersTickets[]
 
   @@map("tickets")
 }
 
-model Event_voucher {
+model EventVoucher {
   id        String    @id @default(cuid()) //primary key
   eventId   String
   name      String
@@ -219,7 +221,102 @@ model Event_voucher {
   deletedAt DateTime?
 
   //relation
-  events Event @relation(fields: [eventId], references: [id])
+  events             Event                @relation(fields: [eventId], references: [id])
+  VoucherTransaction VoucherTransaction[]
 
-  @@map("events_vouchers")
+  @@map("eventsVouchers")
+}
+
+// start here
+
+model VoucherTransaction {
+  id             String    @id @default(cuid())
+  transactionId  String
+  eventVoucherId String
+  createdAt      DateTime  @default(now())
+  deleteAt       DateTime?
+
+  //relation
+  transaction  Transaction  @relation(fields: [transactionId], references: [id])
+  eventVoucher EventVoucher @relation(fields: [eventVoucherId], references: [id])
+
+  @@map("vouchersTransactions")
+}
+
+model Payment {
+  id                String    @id @default(cuid())
+  transactionId     String    @unique
+  imageTransaction  String?
+  description       String
+  organizerDeadline DateTime
+  createdAt         DateTime  @default(now())
+  deletedAt         DateTime?
+
+  //relation
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+
+  @@map("payments")
+}
+
+model transactionTicket {
+  id            String    @id @default(cuid()) //primary key
+  transactionId String
+  ticketId      String
+  amount        Int
+  createdAt     DateTime  @default(now())
+  deletedAt     DateTime?
+
+  // relation
+  transactions Transaction @relation(fields: [transactionId], references: [id])
+  tickets      Ticket      @relation(fields: [ticketId], references: [id])
+
+  @@map("transactionsTickets")
+}
+
+model Review {
+  id         String    @id @default(cuid()) //primary key
+  userId     String
+  eventId    String
+  ticketsId String
+  comment    String
+  rating     Int
+  createdAt  DateTime  @default(now())
+  deletedAt  DateTime?
+
+  // relation
+  users   User   @relation(fields: [userId], references: [id])
+  events  Event  @relation(fields: [eventId], references: [id])
+  tickets Ticket @relation(fields: [ticketsId], references: [id])
+
+  @@map("reviews")
+}
+
+model Cart {
+  id        String   @id @default(cuid()) //primary key
+  userId    String
+  ticketId  String
+  amount    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation
+  users  User   @relation(fields: [userId], references: [id])
+  tikets Ticket @relation(fields: [ticketId], references: [id])
+
+  @@map("carts")
+}
+
+model usersTickets {
+  id        String    @id @default(cuid()) //primary key
+  userId    String
+  ticketId  String
+  amount    Int
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  // relation
+  users   User   @relation(fields: [userId], references: [id])
+  tickets Ticket @relation(fields: [ticketId], references: [id])
+
+  @@map("usersTickets")
 }

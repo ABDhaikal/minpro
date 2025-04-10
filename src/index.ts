@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // your routes should be here
-app.use("/examples", exampleRouter);
+// app.use("/examples", exampleRouter);
 
 // your error middle ware
 app.use(errorMiddleware);
