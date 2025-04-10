@@ -17,6 +17,109 @@ model Example {
   updatedAt DateTime @updatedAt
 }
 
+model User {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  email        String    @unique
+  password     String
+  profile_pict String?
+  point        Int       @default(0)
+  role         Role      @default(USER)
+  reveral_code String    @default(cuid())
+  update_at    DateTime  @updatedAt
+  created_at   DateTime  @default(now())
+  delete_at    DateTime?
+
+  // relation
+  transaction   Transaction[]
+  cuponDiscount CuponDiscount[]
+
+  @@map("users")
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+model Transaction {
+  id               String            @id @default(uuid())
+  userId           String
+  status           TransactionStatus
+  points_used      Int
+  total_price      Int
+  payment_deadline DateTime
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @updatedAt
+  deleted_at       DateTime?
+
+  // relation
+  users              User                @relation(fields: [userId], references: [id])
+  notifications      Notification?
+  cupon_transactions Cupon_Transaction[]
+
+  @@map("transactions")
+}
+
+enum TransactionStatus {
+  WAITING_FOR_PAYMENT
+  WAITING_FOR_ADMIN_CONFIRMATION
+  DONE
+  REJECTED
+  EXPIRED
+  CANCELED
+}
+
+model Notification {
+  id             String   @id @default(uuid()) // Primary Key
+  transaction_id String   @unique
+  message        String
+  is_read        Boolean  @default(false) // Defaults to unread
+  created_at     DateTime @default(now())
+
+  // relation
+  transactions Transaction @relation(fields: [transaction_id], references: [id])
+
+  @@map("notifications")
+}
+
+model CuponDiscount {
+  id         String       @id @default(uuid()) // Primary Key
+  user_id    String
+  type       DiscountType
+  amount     Int
+  expired_at DateTime
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  deleted_at DateTime?
+
+  // relation
+  users              User               @relation(fields: [user_id], references: [id])
+  cupon_transactions Cupon_Transaction?
+
+  @@map("cupon_discounts")
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+model Cupon_Transaction {
+  id             String   @id @default(uuid()) // Primary Key
+  cupon_id       String   @unique
+  transaction_id String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  // relation
+  cupons       CuponDiscount @relation(fields: [cupon_id], references: [id])
+  transactions Transaction   @relation(fields: [transaction_id], references: [id])
+
+  @@map("cupon_transactions")
+}
+
 model Organizer {
   id                String    @id @default(cuid()) //primary key
   name              String
