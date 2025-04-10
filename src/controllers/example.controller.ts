@@ -8,8 +8,8 @@ export const getExamplesController = async (
    next: NextFunction
 ) => {
    try {
-      const examples = await getExamplesService();
-      res.status(200).json(examples);
+      const result = await getExamplesService();
+      res.status(200).json(result);
    } catch (error) {
       next(new ApiError("Error fetching examples", 500));
    }
