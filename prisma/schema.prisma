@@ -119,3 +119,107 @@ model Cupon_Transaction {
 
   @@map("cupon_transactions")
 }
+
+model Organizer {
+  id                String    @id @default(cuid()) //primary key
+  name              String
+  organizer_picture String?
+  description       String
+  bank_target       String
+  payment_target    String
+  updatedAt         DateTime  @updatedAt
+  createdAt         DateTime  @default(now())
+  deletedAt         DateTime?
+
+  //relation
+  Event Event[]
+
+  @@map("organizers")
+}
+
+model Event {
+  id          String    @id @default(cuid()) //primary key
+  organizerId String
+  categoryId  String
+  imageId     String?
+  ticketId    String
+  name        String
+  slug        String    @unique
+  description String
+  location    String
+  event_start DateTime
+  event_end   DateTime
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  //relation
+  organizers    Organizer       @relation(fields: [organizerId], references: [id])
+  categories    Category        @relation(fields: [categoryId], references: [id])
+  Event_voucher Event_voucher[]
+  Image         Image[]
+  Ticket        Ticket[]
+
+  @@map("events")
+}
+
+model Category {
+  id        String    @id @default(cuid()) //primary key
+  name      String
+  image     String?
+  updatedAt DateTime  @updatedAt
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  //relation
+  Event Event[]
+
+  @@map("categories")
+}
+
+model Image {
+  id        String    @id @default(cuid()) //primary key
+  eventId   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  //relation
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@map("images")
+}
+
+model Ticket {
+  id        String    @id @default(cuid()) //primary key
+  eventId   String
+  name      String
+  price     String
+  amount    Int
+  buyed     Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  //relation
+  events Event @relation(fields: [eventId], references: [id])
+
+  @@map("tickets")
+}
+
+model Event_voucher {
+  id        String    @id @default(cuid()) //primary key
+  eventId   String
+  name      String
+  amount    Int
+  quota     Int
+  used      Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  //relation
+  events Event @relation(fields: [eventId], references: [id])
+
+  @@map("events_vouchers")
+}
