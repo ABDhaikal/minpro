@@ -27,6 +27,7 @@ model User {
   Review        Review[]
   Cart          Cart[]
   usersTickets  usersTickets[]
+  Organizer     Organizer?
 
   @@map("users")
 }
@@ -119,6 +120,7 @@ model CuponTransaction {
 
 model Organizer {
   id               String    @id @default(cuid()) //primary key
+  userId           String    @unique
   name             String
   organizerPicture String?
   description      String
@@ -130,6 +132,7 @@ model Organizer {
 
   //relation
   Event Event[]
+  user  User    @relation(fields: [userId], references: [id])
 
   @@map("organizers")
 }
@@ -274,14 +277,14 @@ model transactionTicket {
 }
 
 model Review {
-  id         String    @id @default(cuid()) //primary key
-  userId     String
-  eventId    String
+  id        String    @id @default(cuid()) //primary key
+  userId    String
+  eventId   String
   ticketsId String
-  comment    String
-  rating     Int
-  createdAt  DateTime  @default(now())
-  deletedAt  DateTime?
+  comment   String
+  rating    Int
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
 
   // relation
   users   User   @relation(fields: [userId], references: [id])
