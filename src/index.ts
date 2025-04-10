@@ -2,7 +2,7 @@ import express from "express";
 import { PORT } from "./config/env";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import cors from "cors";
-import userRouter from "./routes/user.router";
+import exampleRouter from "./routes/example.router";
 
 // define the express app
 const app = express();
@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // your routes should be here
-app.use("/users", userRouter);
+app.use("/examples", exampleRouter);
 
 // your error middle ware
 app.use(errorMiddleware);
