@@ -16,7 +16,7 @@ model User {
   profilePict String?
   point       Int       @default(0)
   role        Role      @default(USER)
-  reveralCode String    @default(cuid())
+  referralCode String    @unique 
   updateAt    DateTime  @updatedAt
   createdAt   DateTime  @default(now())
   deletedAt   DateTime?
