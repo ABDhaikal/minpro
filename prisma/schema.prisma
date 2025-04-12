@@ -24,10 +24,9 @@ model User {
   // relation
   transaction   Transaction[]
   cuponDiscount CuponDiscount[]
-  Review        Review[]
   Cart          Cart[]
-  usersTickets  usersTickets[]
   Organizer     Organizer?
+  usersEvents   usersEvents[]
 
   @@map("users")
 }
@@ -96,7 +95,7 @@ model CuponDiscount {
   users             User              @relation(fields: [userId], references: [id])
   cuponTransactions CuponTransaction?
 
-  @@map("cuponDiscounts")
+  @@map("cupon_discounts")
 }
 
 enum DiscountType {
@@ -115,7 +114,7 @@ model CuponTransaction {
   cupons       CuponDiscount @relation(fields: [cuponId], references: [id])
   transactions Transaction   @relation(fields: [transactionId], references: [id])
 
-  @@map("cuponTransactions")
+  @@map("cupon_transactions")
 }
 
 model Organizer {
@@ -159,7 +158,6 @@ model Event {
   EventVoucher EventVoucher[]
   Image        Image[]
   Ticket       Ticket[]
-  Review       Review[]
 
   @@map("events")
 }
@@ -205,9 +203,8 @@ model Ticket {
   //relation
   events            Event               @relation(fields: [eventId], references: [id])
   transactionTicket transactionTicket[]
-  Review            Review[]
   Cart              Cart[]
-  usersTickets      usersTickets[]
+  userEventTicket   userEventTicket[]
 
   @@map("tickets")
 }
@@ -227,7 +224,7 @@ model EventVoucher {
   events             Event                @relation(fields: [eventId], references: [id])
   VoucherTransaction VoucherTransaction[]
 
-  @@map("eventsVouchers")
+  @@map("events_vouchers")
 }
 
 // start here
@@ -243,7 +240,7 @@ model VoucherTransaction {
   transaction  Transaction  @relation(fields: [transactionId], references: [id])
   eventVoucher EventVoucher @relation(fields: [eventVoucherId], references: [id])
 
-  @@map("vouchersTransactions")
+  @@map("vouchers_transactions")
 }
 
 model Payment {
@@ -273,25 +270,7 @@ model transactionTicket {
   transactions Transaction @relation(fields: [transactionId], references: [id])
   tickets      Ticket      @relation(fields: [ticketId], references: [id])
 
-  @@map("transactionsTickets")
-}
-
-model Review {
-  id        String    @id @default(cuid()) //primary key
-  userId    String
-  eventId   String
-  ticketsId String
-  comment   String
-  rating    Int
-  createdAt DateTime  @default(now())
-  deletedAt DateTime?
-
-  // relation
-  users   User   @relation(fields: [userId], references: [id])
-  events  Event  @relation(fields: [eventId], references: [id])
-  tickets Ticket @relation(fields: [ticketsId], references: [id])
-
-  @@map("reviews")
+  @@map("transactions_tickets")
 }
 
 model Cart {
@@ -309,7 +288,7 @@ model Cart {
   @@map("carts")
 }
 
-model usersTickets {
+model usersEvents {
   id        String    @id @default(cuid()) //primary key
   userId    String
   ticketId  String
@@ -318,8 +297,23 @@ model usersTickets {
   deletedAt DateTime?
 
   // relation
-  users   User   @relation(fields: [userId], references: [id])
-  tickets Ticket @relation(fields: [ticketId], references: [id])
+  users           User              @relation(fields: [userId], references: [id])
+  userEventTicket userEventTicket[]
 
-  @@map("usersTickets")
+  @@map("users_events")
+}
+
+model userEventTicket {
+  id          String    @id @default(cuid()) //primary key
+  userEventId String
+  ticketId    String
+  amount      Int
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+
+  // relation
+  tickets     Ticket      @relation(fields: [ticketId], references: [id])
+  usersEvents usersEvents @relation(fields: [userEventId], references: [id])
+
+  @@map("users_event_tickets")
 }
