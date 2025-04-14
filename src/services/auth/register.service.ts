@@ -19,7 +19,7 @@ const validatingRefferalCode = async (referralCode: string | undefined) => {
       },
    });
 
-   return existingReferral as string | null;
+   return existingReferral as User | null;
 };
 
 export const registerService = async (body: RegisterUser) => {
@@ -66,7 +66,7 @@ export const registerService = async (body: RegisterUser) => {
    // check if the referral code is valid
    if (existingReferral) {
       await prisma.userPoint.update({
-         where: { userId: existingReferral },
+         where: { userId: existingReferral.id },
          data: {
             amount: {
                increment: 10000,
