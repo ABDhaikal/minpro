@@ -25,7 +25,7 @@ export const getEventService = async (slug: string) => {
   });
 
   if (!event) {
-    throw new ApiError("Error not Found", 404);
+    throw new ApiError("Event not Found", 404);
   }
   return event;
 };
