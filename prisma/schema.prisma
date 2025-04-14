@@ -9,17 +9,16 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(cuid())
-  username    String    @unique
-  email       String    @unique
-  password    String
-  profilePict String?
-  point       Int       @default(0)
-  role        Role      @default(USER)
-  referralCode String    @unique 
-  updateAt    DateTime  @updatedAt
-  createdAt   DateTime  @default(now())
-  deletedAt   DateTime?
+  id           String    @id @default(cuid())
+  username     String    @unique
+  email        String    @unique
+  password     String
+  profilePict  String?
+  role         Role      @default(USER)
+  referralCode String    @unique
+  updateAt     DateTime  @updatedAt
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
 
   // relation
   transaction   Transaction[]
@@ -27,6 +26,7 @@ model User {
   Cart          Cart[]
   Organizer     Organizer?
   usersEvents   usersEvents[]
+  UserPoint     UserPoint?
 
   @@map("users")
 }
@@ -35,6 +35,20 @@ enum Role {
   USER
   ADMIN
   SUPERADMIN
+}
+
+model UserPoint {
+  id        String    @id @default(cuid()) //primary key
+  userId    String    @unique
+  amount    Int       @default(0)
+  updateAt  DateTime  @updatedAt
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  // relation
+  users User @relation(fields: [userId], references: [id])
+
+  @@map("users_points")
 }
 
 model Transaction {
