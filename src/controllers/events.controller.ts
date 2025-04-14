@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { getEventsService } from "../services/events/get-events.service";
-import { getEventCategory } from "../services/events/get-category-events.service";
+import { getEventCategoryService } from "../services/events/get-event-category.service";
+import { getEventService } from "../services/events/get-event.service";
 
-export const getEventController = async (
+export const getEventsController = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -28,11 +29,23 @@ export const getCategoryController = (
   res: Response,
   next: NextFunction
 ) => {
-  try{
-  const result = getEventCategory();
-  res.status(200).send({ data: result });
+  try {
+    const result = getEventCategoryService();
+    res.status(200).send({ data: result });
+  } catch (error) {
+    next(error);
   }
-  catch(error){
-  next(error);
+};
+
+export const getEventController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await getEventService(req.params.slug as string);
+    res.status(200).send({ data: result }); 
+  } catch (error) {
+    next(error);
   }
 };

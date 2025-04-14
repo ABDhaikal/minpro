@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { getCategoryController, getEventController } from "../controllers/events.controller";
+import { getCategoryController, getEventController, getEventsController } from "../controllers/events.controller";
 
 const router = Router();
 
-router.get("/", getEventController);
+router.get("/", getEventsController);
 router.get("/categories", getCategoryController);
+router.get("/:slug", getEventController);
 
 export default router;
