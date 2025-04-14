@@ -9,16 +9,17 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  email        String    @unique
-  password     String
-  profilePict  String?
-  role         Role      @default(USER)
-  referralCode String    @unique
-  updateAt     DateTime  @updatedAt
-  createdAt    DateTime  @default(now())
-  deletedAt    DateTime?
+  id          String    @id @default(cuid())
+  username    String    @unique
+  email       String    @unique
+  password    String
+  profilePict String?
+  point       Int       @default(0)
+  role        Role      @default(USER)
+  referralCode String    @unique 
+  updateAt    DateTime  @updatedAt
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
 
   // relation
   transaction   Transaction[]
@@ -154,7 +155,7 @@ model Organizer {
 model Event {
   id          String    @id @default(cuid()) //primary key
   organizerId String
-  categoryId  String
+  category    Category
   imageId     String?
   ticketId    String
   name        String
@@ -169,7 +170,6 @@ model Event {
 
   //relation
   organizers   Organizer      @relation(fields: [organizerId], references: [id])
-  categories   Category       @relation(fields: [categoryId], references: [id])
   EventVoucher EventVoucher[]
   Image        Image[]
   Ticket       Ticket[]
@@ -177,26 +177,21 @@ model Event {
   @@map("events")
 }
 
-model Category {
-  id        String    @id @default(cuid()) //primary key
-  name      String
-  image     String?
-  updatedAt DateTime  @updatedAt
-  createdAt DateTime  @default(now())
-  deletedAt DateTime?
-
-  //relation
-  Event Event[]
-
-  @@map("categories")
+enum Category {
+  Sports
+  Festivals
+  Concerts
+  Theater
 }
 
 model Image {
-  id        String    @id @default(cuid()) //primary key
-  eventId   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id          String    @id @default(cuid()) //primary key
+  eventId     String
+  isThumbnail Boolean   @default(false)
+  imageUrl    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
   //relation
   event Event @relation(fields: [eventId], references: [id])

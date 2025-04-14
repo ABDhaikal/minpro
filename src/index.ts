@@ -2,6 +2,7 @@ import express from "express";
 import { PORT } from "./config/env";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import cors from "cors";
+import eventsRouter from "./routes/events.router";
 
 // define your routes here
 import authRouter from "./routes/auth.route";
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use("/auth", authRouter);
 
 // app.use("/examples", exampleRouter);
+app.use("/events", eventsRouter); // example route
 
 // your error middle ware
 app.use(errorMiddleware);
