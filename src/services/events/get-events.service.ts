@@ -11,10 +11,8 @@ export const getEventsService = async (queries: GetEventsService) => {
   const whereClause: Prisma.EventWhereInput = {};
 
   if (search) {
-    whereClause.name = { contains: search, mode: "insensitive" }; //kayaknya buat thumbnail searchnya nggak usah ada
-  }
+    whereClause.name = { contains: search, mode: "insensitive" };
 
-  // ambil data seluruh event dan diikutkan thumbnailnya
   const events = await prisma.event.findMany({
     where: whereClause,
     take: take,

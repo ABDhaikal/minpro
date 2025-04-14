@@ -4,10 +4,6 @@ import { getCategoryController, getEventController } from "../controllers/events
 const router = Router();
 
 router.get("/", getEventController);
-router.get("/categories", getCategoryController); //tanya bisa nggak categories ini disatuin sama yang diatas jadi dalam satu route aja
-// router.get("/events", getEventsByCategoryController);
+router.get("/categories", getCategoryController);
 
 export default router;
-
-//terus kenapa harus /landings apakah karena service ada di dalam folder landing?
-//terus cara penulisan yang enak buat landing page itu gimana?
