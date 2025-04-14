@@ -1,6 +1,6 @@
-export interface paginationQueryParams {
+export interface PaginationQueryParams {
    page: number;
    take: number;
-   shortBy: string;
+   sortBy: string;
    sortOrder: string;
 }
