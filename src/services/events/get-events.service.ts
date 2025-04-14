@@ -13,27 +13,28 @@ export const getEventsService = async (queries: GetEventsService) => {
   if (search) {
     whereClause.name = { contains: search, mode: "insensitive" };
 
-  const events = await prisma.event.findMany({
-    where: whereClause,
-    take: take,
-    skip: (page - 1) * take,
-    orderBy: { [sortBy]: sortOrder },
-    include: {
-      Image: {
-        where: {
-          isThumbnail: true,
-        },
-        select: {
-          imageUrl: true,
+    const events = await prisma.event.findMany({
+      where: whereClause,
+      take: take,
+      skip: (page - 1) * take,
+      orderBy: { [sortBy]: sortOrder },
+      include: {
+        Image: {
+          where: {
+            isThumbnail: true,
+          },
+          select: {
+            imageUrl: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  const count = await prisma.event.count({ where: whereClause });
+    const count = await prisma.event.count({ where: whereClause });
 
-  return {
-    data: events,
-    meta: { page, take, total: count },
-  };
+    return {
+      data: events,
+      meta: { page, take, total: count },
+    };
+  }
 };
