@@ -6,7 +6,7 @@ import { ref } from "process";
 import { CUPON_EXP_MONTHS } from "../../config/env";
 
 interface RegisterUser {
-   userData: Omit<User, "point" | "referralCode">;
+   userData: Omit<User, "referralCode">;
    referralCode?: string;
 }
 
