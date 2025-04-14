@@ -41,6 +41,7 @@ model UserPoint {
   id        String    @id @default(cuid()) //primary key
   userId    String    @unique
   amount    Int       @default(0)
+  expiredAt DateTime
   updateAt  DateTime  @updatedAt
   createdAt DateTime  @default(now())
   deletedAt DateTime?

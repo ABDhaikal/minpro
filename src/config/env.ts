@@ -10,3 +10,6 @@ export const JWT_SECRET = process.env.JWT_SECRET_KEY;
 
 // cupon
 export const CUPON_EXP_MONTHS = 3;
+
+// point
+export const POINT_EXP_MONTHS = 3;

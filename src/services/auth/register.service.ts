@@ -3,7 +3,7 @@ import { User } from "@prisma/client";
 import { ApiError } from "../../utils/api-error";
 import { hashPassword } from "../../lib/argon";
 import { ref } from "process";
-import { CUPON_EXP_MONTHS } from "../../config/env";
+import { CUPON_EXP_MONTHS, POINT_EXP_MONTHS } from "../../config/env";
 
 interface RegisterUser {
    userData: Omit<User, "referralCode">;
@@ -60,6 +60,7 @@ export const registerService = async (body: RegisterUser) => {
    await prisma.userPoint.create({
       data: {
          userId: newUser.id,
+         expiredAt: new Date(),
          amount: 0,
       },
    });
@@ -71,6 +72,9 @@ export const registerService = async (body: RegisterUser) => {
             amount: {
                increment: 10000,
             },
+            expiredAt: new Date(
+               new Date().setMonth(new Date().getMonth() + POINT_EXP_MONTHS)
+            ),
          },
       });
 
