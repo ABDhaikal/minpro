@@ -1,0 +1,47 @@
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Welcome Email</title>
+      <style>
+         body { font-family: Arial, sans-serif; margin: 0; padding: 0;
+         background-color: #f4f4f4; } .email-container { max-width: 600px;
+         margin: 0 auto; background-color: #ffffff; border-radius: 8px;
+         overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); } .header {
+         background-color: #007bff; color: #ffffff; text-align: center; padding:
+         20px; } .content { padding: 20px; text-align: center; line-height: 1.6;
+         } .content h1 { font-size: 24px; margin-bottom: 10px; } .content p {
+         font-size: 16px; color: #333333; } .button { display: inline-block;
+         margin-top: 20px; padding: 12px 24px; background-color: #007bff; color:
+         #ffffff; text-decoration: none; border-radius: 4px; font-weight: bold;
+         } .footer { text-align: center; padding: 10px; background-color:
+         #f9f9f9; color: #777777; font-size: 12px; } .footer a { color: #ffffff;
+         text-decoration: none; }
+      </style>
+   </head>
+   <body>
+      <div class="email-container">
+         <!-- Header Section -->
+         <div class="header">
+            <h1>Welcome to Our Platform!</h1>
+         </div>
+
+         <!-- Content Section -->
+         <div class="content">
+            <h1>Hi {{name}},</h1>
+            <p>Thank you for registering with us! We're excited to have you on
+               board.</p>
+            <p>To get started, please verify your email address by clicking the
+               button below:</p>
+            <a href={{link}} class="button">Visit Website</a>
+            <p>If you have any questions or need assistance, feel free to reach
+               out to our support team.</p>
+         </div>
+
+         <!-- Footer Section -->
+         <div class="footer">
+            <p>You received this email because you registering up on our platform.
+         </div>
+      </div>
+   </body>
+</html>
