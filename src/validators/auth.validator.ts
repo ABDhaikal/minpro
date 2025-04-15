@@ -31,3 +31,23 @@ export const validateRegister = [
       next();
    },
 ];
+
+export const validateLogin = [
+   body("userData.email")
+      .notEmpty()
+      .withMessage("Email is required")
+      .isEmail()
+      .withMessage("Email is invalid"),
+   body("userData.password")
+      .notEmpty()
+      .withMessage("Password is required")
+      .isString()
+      .withMessage("Password must be a string"),
+   (req: Request, res: Response, next: NextFunction) => {
+      const err = validationResult(req);
+      if (!err.isEmpty()) {
+         throw new ApiError(err.array()[0].msg, 400);
+      }
+      next();
+   },
+];
