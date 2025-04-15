@@ -4,6 +4,9 @@ import { errorMiddleware } from "./middlewares/error.middleware";
 import cors from "cors";
 import eventsRouter from "./routes/events.router";
 
+// define your routes here
+import authRouter from "./routes/auth.route";
+
 // define the express app
 const app = express();
 // app cors
@@ -13,6 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 // your routes should be here
+app.use("/auth", authRouter);
+
 // app.use("/examples", exampleRouter);
 app.use("/events", eventsRouter); // example route
 
