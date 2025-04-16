@@ -141,7 +141,7 @@ model Organizer {
   organizerPicture String?
   description      String
   bankTarget       String
-  paymentTarget    String
+  paymentTarget    Int
   updatedAt        DateTime  @updatedAt
   createdAt        DateTime  @default(now())
   deletedAt        DateTime?
@@ -292,7 +292,7 @@ model Cart {
   updatedAt DateTime @updatedAt
 
   // relation
-  users  User   @relation(fields: [userId], references: [id])
+  users   User   @relation(fields: [userId], references: [id])
   tickets Ticket @relation(fields: [ticketId], references: [id])
 
   @@map("carts")
