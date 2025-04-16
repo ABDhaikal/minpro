@@ -159,7 +159,6 @@ model Event {
   organizerId String
   category    Category
   imageId     String?
-  ticketId    String
   name        String
   slug        String    @unique
   description String
@@ -295,7 +294,7 @@ model Cart {
 
   // relation
   users  User   @relation(fields: [userId], references: [id])
-  tikets Ticket @relation(fields: [ticketId], references: [id])
+  tickets Ticket @relation(fields: [ticketId], references: [id])
 
   @@map("carts")
 }
