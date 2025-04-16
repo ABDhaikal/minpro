@@ -1,6 +1,6 @@
 import { User } from "@prisma/client";
 import { sign } from "jsonwebtoken";
-import { JWT_SECRET } from "../../config/env";
+import { JWT_SECRET, LOGIN_EXPIRATION } from "../../config/env";
 import prisma from "../../config/prisma";
 import { verifyPassword } from "../../lib/argon";
 import { ApiError } from "../../utils/api-error";
@@ -38,7 +38,7 @@ export const LoginService = async (body: ILoginService) => {
       role: existingUser.role,
    };
    const token = sign(tokenPayload, JWT_SECRET as string, {
-      expiresIn: "2h",
+      expiresIn: LOGIN_EXPIRATION,
    });
 
    const { password, ...userWithoutPassword } = existingUser;

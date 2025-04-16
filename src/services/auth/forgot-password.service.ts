@@ -1,5 +1,5 @@
 import { sign } from "jsonwebtoken";
-import { JWT_SECRET } from "../../config/env";
+import { FORGOT_PASSWORD_EXPIRATION, JWT_SECRET } from "../../config/env";
 import prisma from "../../config/prisma";
 import { ApiError } from "../../utils/api-error";
 
@@ -17,7 +17,7 @@ export const ForgotPasswordService = async (email: string) => {
       role: existingUser.role,
    };
    const token = sign(tokenPayload, JWT_SECRET as string, {
-      expiresIn: "2h",
+      expiresIn: FORGOT_PASSWORD_EXPIRATION,
    });
 
    console.log(token);
