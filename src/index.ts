@@ -4,6 +4,7 @@ import { errorMiddleware } from "./middlewares/error.middleware";
 import cors from "cors";
 import eventsRouter from "./routes/events.router";
 import cartsRouter from "./routes/carts.router";
+import profileRouter from "./routes/profile.route";
 
 // define your routes here
 import authRouter from "./routes/auth.route";
@@ -14,11 +15,11 @@ app.use(cors());
 
 app.use(express.json());
 
-
+// your routes should be here
 app.use("/events", eventsRouter);
 app.use("/carts", cartsRouter);
-// your routes should be here
 app.use("/auth", authRouter);
+app.use("/profile", profileRouter);
 
 // app.use("/examples", exampleRouter);
 app.use("/events", eventsRouter); // example route
