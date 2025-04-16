@@ -9,18 +9,18 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(cuid())
-  username    String    
-  email       String    @unique
-  isVerified  Boolean   @default(false)
-  password    String
-  profilePict String?
-  point       Int       @default(0)
-  role        Role      @default(USER)
-  referralCode String    @unique 
-  updateAt    DateTime  @updatedAt
-  createdAt   DateTime  @default(now())
-  deletedAt   DateTime?
+  id           String    @id @default(cuid())
+  username     String
+  email        String    @unique
+  isVerified   Boolean   @default(false)
+  password     String
+  profilePict  String?
+  point        Int       @default(0)
+  role         Role      @default(USER)
+  referralCode String    @unique
+  updateAt     DateTime  @updatedAt
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
 
   // relation
   transaction   Transaction[]
@@ -162,7 +162,7 @@ model Event {
   name        String
   slug        String    @unique
   description String
-  location    String
+  location    Location
   eventStart  DateTime
   eventEnd    DateTime
   createdAt   DateTime  @default(now())
@@ -183,6 +183,47 @@ enum Category {
   Festivals
   Concerts
   Theater
+}
+
+enum Location {
+  ACEH
+  SUMATERA_UTARA
+  SUMATERA_BARAT
+  RIAU
+  JAMBI
+  SUMATERA_SELATAN
+  BENGKULU
+  LAMPUNG
+  KEPULAUAN_BANGKA_BELITUNG
+  KEPULAUAN_RIAU
+  DKI_JAKARTA
+  JAWA_BARAT
+  JAWA_TENGAH
+  DI_YOGYAKARTA
+  JAWA_TIMUR
+  BANTEN
+  BALI
+  NUSA_TENGGARA_BARAT
+  NUSA_TENGGARA_TIMUR
+  KALIMANTAN_BARAT
+  KALIMANTAN_TENGAH
+  KALIMANTAN_SELATAN
+  KALIMANTAN_TIMUR
+  KALIMANTAN_UTARA
+  SULAWESI_UTARA
+  SULAWESI_TENGAH
+  SULAWESI_SELATAN
+  SULAWESI_TENGGARA
+  GORONTALO
+  SULAWESI_BARAT
+  MALUKU
+  MALUKU_UTARA
+  PAPUA
+  PAPUA_BARAT
+  PAPUA_TENGAH
+  PAPUA_PEGUNUNGAN
+  PAPUA_SELATAN
+  PAPUA_BARAT_DAYA
 }
 
 model Image {
@@ -293,7 +334,7 @@ model Cart {
   updatedAt DateTime @updatedAt
 
   // relation
-  users  User   @relation(fields: [userId], references: [id])
+  users   User   @relation(fields: [userId], references: [id])
   tickets Ticket @relation(fields: [ticketId], references: [id])
 
   @@map("carts")
