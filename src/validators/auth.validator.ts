@@ -25,9 +25,31 @@ export const validateRegister = [
       ),
    (req: Request, res: Response, next: NextFunction) => {
       const err = validationResult(req);
+      const requeredFields = [
+         "name",
+         "description",
+         "bankTarget",
+         "paymentTarget",
+      ];
+
+      if (req.body.organizerData) {
+         const Errordata = [];
+         for (const field of requeredFields) {
+            if (!req.body.organizerData[field]) {
+               Errordata.push(field);
+            }
+         }
+         if (Errordata.length > 0) {
+            throw new ApiError(
+               `Organizer data is required for ${Errordata.join(", ")}`,
+               400
+            );
+         }
+      }
       if (!err.isEmpty()) {
          throw new ApiError(err.array()[0].msg, 400);
       }
+
       next();
    },
 ];

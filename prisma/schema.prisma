@@ -137,7 +137,8 @@ model CuponTransaction {
 model Organizer {
   id               String    @id @default(cuid()) //primary key
   userId           String    @unique
-  name             String
+  name             String    @unique
+  slug             String    @unique
   organizerPicture String?
   description      String
   bankTarget       String
