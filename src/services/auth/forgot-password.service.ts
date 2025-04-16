@@ -7,7 +7,7 @@ export const ForgotPasswordService = async (email: string) => {
    const existingUser = await prisma.user.findUnique({
       where: { email: email },
    });
-   if (!existingUser) {
+   if (!existingUser || existingUser.deletedAt) {
       throw new ApiError("Email is not registered", 404);
    }
 
@@ -22,6 +22,5 @@ export const ForgotPasswordService = async (email: string) => {
 
    console.log(token);
 
-   const { password, ...userWithoutPassword } = existingUser;
    return " Password reset link sent to your email";
 };

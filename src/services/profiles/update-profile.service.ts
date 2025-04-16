@@ -15,10 +15,11 @@ export const updateProfileService = async (
       select: {
          id: true,
          profilePict: true,
+         deletedAt: true,
       },
    });
 
-   if (!validatingUser) {
+   if (!validatingUser || validatingUser.deletedAt) {
       throw new ApiError("User not found", 404);
    }
 

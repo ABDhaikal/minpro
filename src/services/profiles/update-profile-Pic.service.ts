@@ -7,6 +7,9 @@ export const updateProfilePictService = async (
    senderId: string,
    inputProfilePict: Express.Multer.File
 ) => {
+   if (!inputProfilePict) {
+      throw new ApiError("Image is required", 400);
+   }
    const validatingUser = await prisma.user.findUnique({
       where: {
          id: senderId,
@@ -14,10 +17,11 @@ export const updateProfilePictService = async (
       select: {
          id: true,
          profilePict: true,
+         deletedAt: true,
       },
    });
 
-   if (!validatingUser) {
+   if (!validatingUser || validatingUser.deletedAt) {
       throw new ApiError("User not found", 404);
    }
 

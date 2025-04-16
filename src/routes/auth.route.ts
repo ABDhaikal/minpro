@@ -1,10 +1,13 @@
 import { Router } from "express";
 import {
+    forgotPasswordController,
     loginController,
    registerController,
+   updatePasswordController,
    validatingRefferalCodeController,
 } from "../controllers/auth.controller";
 import { validateLogin, validateRegister } from "../validators/auth.validator";
+import { verifyToken } from "../lib/jwt";
 
 const router = Router();
 
@@ -12,4 +15,7 @@ const router = Router();
 router.post("/register", validateRegister, registerController);
 router.post("/login", validateLogin, loginController);
 router.post("/valid-refferal", validatingRefferalCodeController);
+router.post("/forgot-pass",verifyToken, forgotPasswordController);
+router.patch("/update-pass",verifyToken, updatePasswordController);
+
 export default router;

@@ -13,7 +13,7 @@ export const LoginService = async (body: ILoginService) => {
    const existingUser = await prisma.user.findUnique({
       where: { email: body.userData.email },
    });
-   if (!existingUser) {
+   if (!existingUser || existingUser.deletedAt) {
       throw new ApiError("Email is not registered", 404);
    }
 

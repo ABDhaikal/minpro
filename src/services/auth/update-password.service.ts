@@ -4,10 +4,10 @@ import { ApiError } from "../../utils/api-error";
 
 export const updatePasswordService = async (
    userId: string,
-   Oldpassword: string,
+   oldpassword: string,
    newPassword: string
 ) => {
-   if (!Oldpassword) {
+   if (!oldpassword) {
       throw new ApiError("Password is required", 400);
    }
    if (!newPassword) {
@@ -20,14 +20,15 @@ export const updatePasswordService = async (
       select: {
          id: true,
          password: true,
+         deletedAt: true,
       },
    });
 
-   if (!existingUser) {
+   if (!existingUser || existingUser.deletedAt) {
       throw new ApiError("User not found", 404);
    }
    const isPasswordValid = await verifyPassword(
-      Oldpassword,
+      oldpassword,
       existingUser.password
    );
    if (!isPasswordValid) {

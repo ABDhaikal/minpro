@@ -17,9 +17,10 @@ export const resetPasswordService = async (
       },
       select: {
          id: true,
+         deletedAt: true,
       },
    });
-   if (!existingUser) {
+   if (!existingUser || existingUser.deletedAt) {
       throw new ApiError("invalid token", 401);
    }
 
