@@ -3,18 +3,16 @@ import { PORT } from "./config/env";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import cors from "cors";
 import eventsRouter from "./routes/events.router";
+import cartsRouter from "./routes/carts.router";
 
-// define the express app
 const app = express();
-// app cors
 app.use(cors());
 
-// define express json for parsing json data
 app.use(express.json());
 
-// your routes should be here
-// app.use("/examples", exampleRouter);
-app.use("/events", eventsRouter); // example route
+
+app.use("/events", eventsRouter);
+app.use("/carts", cartsRouter);
 
 // your error middle ware
 app.use(errorMiddleware);
