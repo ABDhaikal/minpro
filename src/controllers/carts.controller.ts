@@ -11,8 +11,8 @@ export const getCartController = async (
   next: NextFunction
 ) => {
   try {
-    //pakai dulu locals
-    const userId = "cm9iflrpi0000u274012c1rl8"
+    
+    const userId = res.locals.user?.id;
     const result = await getCartService(userId);
 
     res.status(200).send(result);
@@ -76,8 +76,6 @@ export const updateCartController = async (
     const result = await updateCartService(body, userId);
 
     res.status(200).send(result);
-    // message: "Cart updated successfully",
-    // data: result,
   } catch (error) {
     next(error);
   }
