@@ -1,6 +1,8 @@
 import { Organizer, User } from "@prisma/client";
 import {
    APP_URL,
+   CUPON_DISCOUNT_AMOUNT,
+   CUPON_DISCOUNT_TYPE,
    CUPON_EXP_MONTHS,
    JWT_SECRET,
    POINT_EXP_MONTHS,
@@ -14,15 +16,16 @@ import { join } from "path";
 import fs from "fs/promises";
 import { sign } from "jsonwebtoken";
 import { nanoid } from "nanoid";
+import slugify from "slugify";
 
 interface RegisterUser {
    userData: Omit<User, "referralCode">;
    referralCode?: string;
-   organizerData: Organizer;
+   organizerData?: Organizer;
 }
 
 const validatingRefferalCode = async (referralCode: string | undefined) => {
-   if (!referralCode) return null;
+   if (!referralCode || !referralCode.trim()) return null;
    const existingReferral = await prisma.user.findUnique({
       where: { referralCode: referralCode },
       select: {
@@ -35,11 +38,28 @@ const validatingRefferalCode = async (referralCode: string | undefined) => {
    return existingReferral as User;
 };
 
+const validateOrganizerData = async (organizerData: Organizer | undefined) => {
+   if (!organizerData) return false;
+   if (organizerData) {
+      const existingOrganizer = await prisma.organizer.findUnique({
+         where: { name: organizerData.name },
+      });
+      if (existingOrganizer) {
+         throw new ApiError("Organizer name already exists", 409);
+      }
+   }
+   organizerData.slug = slugify(organizerData.name, {
+      replacement: "_",
+      lower: true,
+   });
+
+   return organizerData;
+};
+
 export const registerService = async (body: RegisterUser) => {
    const existingUser = await prisma.user.findUnique({
       where: { email: body.userData.email },
    });
-
    if (existingUser) {
       if (existingUser.deletedAt) {
          throw new ApiError("User have been register but deleted", 409);
@@ -48,15 +68,11 @@ export const registerService = async (body: RegisterUser) => {
       throw new ApiError("User already exists", 409);
    }
    const existingReferral = await validatingRefferalCode(body.referralCode);
-
+   const ValidOrganizerData = await validateOrganizerData(body.organizerData);
    const result = await prisma.$transaction(async (tx) => {
-      // generate referral code
       const referralCode = nanoid(6);
-
-      // hasing password
-      const hashedPassword = await hashPassword(body.userData.password!);
-      body.userData.password = hashedPassword;
-
+      body.userData.password = await hashPassword(body.userData.password!);
+      if (ValidOrganizerData) body.userData.role = "ADMIN";
       const inputData = {
          referralCode: referralCode,
          ...body.userData,
@@ -93,15 +109,22 @@ export const registerService = async (body: RegisterUser) => {
          await tx.cuponDiscount.create({
             data: {
                userId: newUser.id,
-               amount: 10000,
-               type: "FIXED_AMOUNT",
+               amount: CUPON_DISCOUNT_AMOUNT,
+               type: CUPON_DISCOUNT_TYPE,
                expiredAt: new Date(
                   new Date().setMonth(new Date().getMonth() + CUPON_EXP_MONTHS)
                ),
             },
          });
       }
-
+      if (ValidOrganizerData) {
+         await tx.organizer.create({
+            data: {
+               ...ValidOrganizerData,
+               userId: newUser.id,
+            },
+         });
+      }
       // generate token fo verification email
       const tokenPayload = {
          id: newUser.id,
