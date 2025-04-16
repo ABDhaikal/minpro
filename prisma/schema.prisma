@@ -161,7 +161,7 @@ model Event {
   name        String
   slug        String    @unique
   description String
-  location    String
+  location    Location
   eventStart  DateTime
   eventEnd    DateTime
   createdAt   DateTime  @default(now())
@@ -182,6 +182,47 @@ enum Category {
   Festivals
   Concerts
   Theater
+}
+
+enum Location {
+  ACEH
+  SUMATERA_UTARA
+  SUMATERA_BARAT
+  RIAU
+  JAMBI
+  SUMATERA_SELATAN
+  BENGKULU
+  LAMPUNG
+  KEPULAUAN_BANGKA_BELITUNG
+  KEPULAUAN_RIAU
+  DKI_JAKARTA
+  JAWA_BARAT
+  JAWA_TENGAH
+  DI_YOGYAKARTA
+  JAWA_TIMUR
+  BANTEN
+  BALI
+  NUSA_TENGGARA_BARAT
+  NUSA_TENGGARA_TIMUR
+  KALIMANTAN_BARAT
+  KALIMANTAN_TENGAH
+  KALIMANTAN_SELATAN
+  KALIMANTAN_TIMUR
+  KALIMANTAN_UTARA
+  SULAWESI_UTARA
+  SULAWESI_TENGAH
+  SULAWESI_SELATAN
+  SULAWESI_TENGGARA
+  GORONTALO
+  SULAWESI_BARAT
+  MALUKU
+  MALUKU_UTARA
+  PAPUA
+  PAPUA_BARAT
+  PAPUA_TENGAH
+  PAPUA_PEGUNUNGAN
+  PAPUA_SELATAN
+  PAPUA_BARAT_DAYA
 }
 
 model Image {

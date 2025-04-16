@@ -1,40 +1,57 @@
-import { Prisma } from "@prisma/client";
+import { Category, Location, Prisma } from "@prisma/client";
 import prisma from "../../config/prisma";
 import { PaginationQueryParams } from "../../types/pagination";
+import { ApiError } from "../../utils/api-error";
 
 interface GetEventsService extends PaginationQueryParams {
   search: string;
+  category: string | null;
+  location: string;
 }
+
 export const getEventsService = async (queries: GetEventsService) => {
-  const { page, take, sortBy, sortOrder, search } = queries;
+  const { page, take, sortBy, sortOrder, search, category, location } = queries;
 
   const whereClause: Prisma.EventWhereInput = {};
 
   if (search) {
     whereClause.name = { contains: search, mode: "insensitive" };
+  }
+  if (location) {
+    if (!Object.values(Location).includes(location as Location)) {
+      throw new ApiError(`Invalid location: ${location}`, 404);
+    }
+    whereClause.location = { equals: location as Location };
+  }
 
-    const events = await prisma.event.findMany({
-      where: whereClause,
-      take: take,
-      skip: (page - 1) * take,
-      orderBy: { [sortBy]: sortOrder },
-      include: {
-        Image: {
-          where: {
-            isThumbnail: true,
-          },
-          select: {
-            imageUrl: true,
-          },
+  if (category) {
+    if (!Object.values(Category).includes(category as Category)) {
+      throw new ApiError(`Invalid category: ${category}`, 404);
+    }
+    whereClause.category = { equals: category as Category };
+  }
+
+  const events = await prisma.event.findMany({
+    where: whereClause,
+    take: take,
+    skip: (page - 1) * take,
+    orderBy: { [sortBy]: sortOrder },
+    include: {
+      Image: {
+        where: {
+          isThumbnail: true,
+        },
+        select: {
+          imageUrl: true,
         },
       },
-    });
+    },
+  });
 
-    const count = await prisma.event.count({ where: whereClause });
+  const count = await prisma.event.count({ where: whereClause });
 
-    return {
-      data: events,
-      meta: { page, take, total: count },
-    };
-  }
+  return {
+    data: events,
+    meta: { page, take, total: count },
+  };
 };
