@@ -12,10 +12,7 @@ model User {
   id           String    @id @default(cuid())
   username     String
   email        String    @unique
-<<<<<<< HEAD
   isVerified   Boolean   @default(false)
-=======
->>>>>>> b119255836ac875465d35c0558c75e4d69055a19
   password     String
   profilePict  String?
   point        Int       @default(0)

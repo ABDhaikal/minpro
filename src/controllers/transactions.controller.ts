@@ -25,7 +25,7 @@ export const uploadPaymentProofController = async (
   ) => {
     try {
         const { id } = req.params;
-        const authUserId = String(req.locals.user.id);
+        const authUserId = String(res.locals.user.id);
         const paymentProofFile = req.body.paymentProof;
     
         const result = await uploadPaymentProofService(id, authUserId, paymentProofFile);

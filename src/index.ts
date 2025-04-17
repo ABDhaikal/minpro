@@ -20,11 +20,8 @@ app.use(express.json());
 app.use("/events", eventsRouter);
 app.use("/carts", cartsRouter);
 app.use("/auth", authRouter);
-<<<<<<< HEAD
 app.use("/transactions", transactionsRouter);
-=======
 app.use("/profile", profileRouter);
->>>>>>> b119255836ac875465d35c0558c75e4d69055a19
 
 // app.use("/examples", exampleRouter);
 app.use("/events", eventsRouter); // example route
