@@ -7,6 +7,7 @@ import cartsRouter from "./routes/carts.router";
 
 // define your routes here
 import authRouter from "./routes/auth.route";
+import transactionsRouter from "./routes/transactions.router";
 
 // define the express app
 const app = express();
@@ -19,6 +20,7 @@ app.use("/events", eventsRouter);
 app.use("/carts", cartsRouter);
 // your routes should be here
 app.use("/auth", authRouter);
+app.use("/transactions", transactionsRouter);
 
 // app.use("/examples", exampleRouter);
 app.use("/events", eventsRouter); // example route
