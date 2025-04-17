@@ -12,7 +12,6 @@ model User {
   id           String    @id @default(cuid())
   username     String
   email        String    @unique
-  isVerified   Boolean   @default(false)
   password     String
   profilePict  String?
   point        Int       @default(0)
@@ -142,7 +141,7 @@ model Organizer {
   organizerPicture String?
   description      String
   bankTarget       String
-  paymentTarget    String
+  paymentTarget    Int
   updatedAt        DateTime  @updatedAt
   createdAt        DateTime  @default(now())
   deletedAt        DateTime?

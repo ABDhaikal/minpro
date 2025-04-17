@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from "express";
+import { LoginService } from "../services/auth/login.service";
 import { registerService } from "../services/auth/register.service";
 import { validatingRefferalCodeService } from "../services/auth/validating-refferal-code.service";
-import { LoginService } from "../services/auth/login.service";
+import { ApiError } from "../utils/api-error";
+import { updatePasswordService } from "../services/auth/update-password.service";
+import { resetPasswordService } from "../services/auth/reset-password.service";
+import { ForgotPasswordService } from "../services/auth/forgot-password.service";
 
 export const registerController = async (
    req: Request,
@@ -32,8 +36,6 @@ export const validatingRefferalCodeController = async (
    }
 };
 
-
-
 export const loginController = async (
    req: Request,
    res: Response,
@@ -44,5 +46,51 @@ export const loginController = async (
       res.status(200).json(user);
    } catch (error) {
       next(error);
+   }
+};
+
+export const updatePasswordController = async (
+   req: Request,
+   res: Response,
+   next: NextFunction
+) => {
+   try {
+      const authUserId = res.locals.user.id;
+      const tokenForget = res.locals.user.tokenForget;
+      if (!authUserId && !tokenForget) {
+         throw new ApiError(
+            "You are not allowed to update password with token forget",
+            401
+         );
+      }
+      if (authUserId) {
+         const result = await updatePasswordService(
+            authUserId,
+            req.body.oldPassword,
+            req.body.newPassword
+         );
+         res.status(200).json(result);
+      } else {
+         const result = await resetPasswordService(
+            tokenForget,
+            req.body.newPassword
+         );
+      }
+   } catch (error) {
+      return next(error);
+   }
+};
+
+export const forgotPasswordController = async (
+   req: Request,
+   res: Response,
+   next: NextFunction
+) => {
+   try {
+      const email = req.body.email;
+      const result = await ForgotPasswordService(email);
+      res.status(200).json(result);
+   } catch (error) {
+      return next(error);
    }
 };
