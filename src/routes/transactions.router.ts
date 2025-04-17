@@ -3,8 +3,12 @@ import { createTransactionController, uploadPaymentProofController } from "../co
 import { verifyToken } from "../lib/jwt";
 import { verifyRole } from "../middlewares/role.middleware";
 import { validateCreateTransaction } from "../validators/transaction.validator";
+import multer from "multer"
+
 
 const router = Router();
+
+const upload = multer({storage: multer.memoryStorage()})
 
 router.post(
   "/",
@@ -15,9 +19,10 @@ router.post(
 );
 
 router.post(
-    "/transactions/:id/payment-proof",
+    "/transactions/:transactioId/payment-proof",
     verifyToken,
     verifyRole(["USER"]),
+    upload.single("imageTransaction"),
     uploadPaymentProofController
   );
 

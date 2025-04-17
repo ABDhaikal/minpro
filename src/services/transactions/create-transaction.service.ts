@@ -8,6 +8,7 @@ export const createTransactionService = async (
   body: Pick<Transaction, "pointsUsed" | "totalPrice" | "paymentDeadline">,
   authUserId: string
 ) => {
+    
   if (!body.pointsUsed || !body.totalPrice || !body.paymentDeadline) {
     throw new ApiError("Invalid input data", 400);
   }
