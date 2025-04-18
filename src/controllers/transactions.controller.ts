@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { createTransactionService } from "../services/transactions/create-transaction.service";
 import { uploadPaymentProofService } from "../services/transactions/upload-proof-payment.service";
 import multer from "multer";
+import { ApiError } from "../utils/api-error";
 
 export const createTransactionController = async (
   req: Request,
@@ -29,7 +30,7 @@ export const uploadPaymentProofController = async (
     const file = req.file as Express.Multer.File;
 
     if (!file) {
-      return res.status(400).send({ message: "No file uploaded" });
+      throw new ApiError("No file uploaded", 400)
     }
 
     const { transactionId } = req.params;
