@@ -12,6 +12,7 @@ model User {
   id           String    @id @default(cuid())
   username     String
   email        String    @unique
+  isVerified   Boolean   @default(false)
   password     String
   profilePict  String?
   point        Int       @default(0)
@@ -54,15 +55,18 @@ model UserPoint {
 }
 
 model Transaction {
-  id              String            @id @default(uuid())
-  userId          String
-  status          TransactionStatus
-  pointsUsed      Int
-  totalPrice      Int
-  paymentDeadline DateTime
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  deletedAt       DateTime?
+  id                String            @id @default(uuid())
+  userId            String
+  status            TransactionStatus
+  pointsUsed        Int
+  totalPrice        Int
+  paymentDeadline   DateTime
+  paymentProof      String?
+  organizerDeadline DateTime?
+  transactionDetail String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  deletedAt         DateTime?
 
   // relation
   users              User                 @relation(fields: [userId], references: [id])
@@ -70,7 +74,6 @@ model Transaction {
   cuponTransactions  CuponTransaction[]
   voucherTransaction VoucherTransaction[]
   transactionTicket  transactionTicket[]
-  Payment            Payment?
 
   @@map("transactions")
 }
@@ -162,6 +165,7 @@ model Event {
   slug        String    @unique
   description String
   location    Location
+  status      StatusEvent @default(DRAFT)
   eventStart  DateTime
   eventEnd    DateTime
   createdAt   DateTime  @default(now())
@@ -223,6 +227,12 @@ enum Location {
   PAPUA_PEGUNUNGAN
   PAPUA_SELATAN
   PAPUA_BARAT_DAYA
+}
+
+enum StatusEvent {
+  EXPIRED
+  PUBLISH
+  DRAFT
 }
 
 model Image {
@@ -292,21 +302,6 @@ model VoucherTransaction {
   eventVoucher EventVoucher @relation(fields: [eventVoucherId], references: [id])
 
   @@map("vouchers_transactions")
-}
-
-model Payment {
-  id                String    @id @default(cuid())
-  transactionId     String    @unique
-  imageTransaction  String?
-  description       String
-  organizerDeadline DateTime
-  createdAt         DateTime  @default(now())
-  deletedAt         DateTime?
-
-  //relation
-  transaction Transaction @relation(fields: [transactionId], references: [id])
-
-  @@map("payments")
 }
 
 model transactionTicket {

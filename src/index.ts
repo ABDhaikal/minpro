@@ -8,6 +8,7 @@ import profileRouter from "./routes/profile.route";
 
 // define your routes here
 import authRouter from "./routes/auth.route";
+// import transactionsRouter from "./routes/transactions.router";
 
 // define the express app
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use("/events", eventsRouter);
 app.use("/carts", cartsRouter);
 app.use("/auth", authRouter);
+// app.use("/transactions", transactionsRouter);
 app.use("/profile", profileRouter);
 
 // app.use("/examples", exampleRouter);
