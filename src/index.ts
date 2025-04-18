@@ -4,10 +4,13 @@ import { errorMiddleware } from "./middlewares/error.middleware";
 import cors from "cors";
 import eventsRouter from "./routes/events.router";
 import cartsRouter from "./routes/carts.router";
-import profileRouter from "./routes/profile.route";
+import profileRouter from "./routes/profile.router";
+
+
+import "./jobs";
 
 // define your routes here
-import authRouter from "./routes/auth.route";
+import authRouter from "./routes/auth.router";
 // import transactionsRouter from "./routes/transactions.router";
 
 // define the express app
