@@ -15,7 +15,7 @@ const router = Router();
 router.post("/register", validateRegister, registerController);
 router.post("/login", validateLogin, loginController);
 router.post("/valid-refferal", validatingRefferalCodeController);
-router.post("/forgot-pass",verifyToken, forgotPasswordController);
+router.post("/forgot-pass", forgotPasswordController);
 router.patch("/update-pass",verifyToken, updatePasswordController);
 
 export default router;
