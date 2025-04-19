@@ -19,18 +19,3 @@ export const validateUpdateUserProfile = [
    },
 ];
 
-export const validateUpdateOrganizerProfile = [
-   body("name").notEmpty().withMessage("name is required"),
-   body("description").notEmpty().withMessage("description is required"),
-   body("bankTarget").notEmpty().withMessage("bankTarget is required"),
-   body("paymentTarget").notEmpty().withMessage("paymentTarget is required"),
-
-   (req: Request, res: Response, next: NextFunction) => {
-      const err = validationResult(req);
-      if (!err.isEmpty()) {
-         throw new ApiError(err.array()[0].msg, 400);
-      }
-
-      next();
-   },
-];

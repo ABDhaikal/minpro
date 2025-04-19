@@ -7,7 +7,7 @@ import { ApiError } from "../../utils/api-error";
 export const updateOrganizerService = async (
    senderId: string,
    inputData: Organizer,
-   inputProfilePict?: Express.Multer.File
+   picture?: Express.Multer.File
 ) => {
    const validdatingOrganizer = await prisma.organizer.findUnique({
       where: {
@@ -44,10 +44,31 @@ export const updateOrganizerService = async (
          lower: true,
       });
    }
+   else {
+      inputData.slug = validdatingOrganizer.slug;
+      inputData.name = validdatingOrganizer.name;
+   }
 
-   if (inputProfilePict) {
+   if (!inputData.bankTarget){
+      inputData.bankTarget = validdatingOrganizer.bankTarget;
+   }
+
+   if(!inputData.description) {
+      inputData.description = validdatingOrganizer.description;
+   }
+
+   if (inputData.paymentTarget) {
+      inputData.paymentTarget = Number(inputData.paymentTarget);
+      if (isNaN(inputData.paymentTarget) || inputData.paymentTarget < 0) {
+         throw new ApiError("invalid payment target", 400);
+      }
+   } else {
+      inputData.paymentTarget = validdatingOrganizer.paymentTarget;
+   }
+
+   if (picture) {
       const { secure_url } = await cloudinaryUpload(
-         inputProfilePict,
+         picture,
          "organizer/profile"
       );
 
@@ -55,11 +76,13 @@ export const updateOrganizerService = async (
          await cloudinaryRemove(validdatingOrganizer.organizerPicture);
       }
       inputData.organizerPicture = secure_url;
+   } else {
+      inputData.organizerPicture = validdatingOrganizer.organizerPicture;
    }
 
-   const updatedUser = await prisma.user.update({
+   const updatedUser = await prisma.organizer.update({
       where: {
-         id: senderId,
+         userId: senderId,
       },
       data: {
          ...inputData,

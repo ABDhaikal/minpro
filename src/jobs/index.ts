@@ -2,4 +2,5 @@
 import "./workers/transaction.worker";
 
 // CRON
-import "./cron/hellow-world.cron"; 
+import "./cron/userPointExpired.cron";
+import "./cron/cuponExpired.cron";

@@ -26,6 +26,11 @@ interface RegisterUser {
 
 const validatingRefferalCode = async (referralCode: string | undefined) => {
    if (!referralCode || !referralCode.trim()) return null;
+
+   if (typeof referralCode !== "string") {
+      throw new ApiError("Referral code must be a string", 400);
+   }
+
    const existingReferral = await prisma.user.findUnique({
       where: { referralCode: referralCode },
       select: {
@@ -40,6 +45,7 @@ const validatingRefferalCode = async (referralCode: string | undefined) => {
 
 const validateOrganizerData = async (organizerData: Organizer | undefined) => {
    if (!organizerData) return false;
+   if (!organizerData.name) return false;
    if (organizerData) {
       const existingOrganizer = await prisma.organizer.findUnique({
          where: { name: organizerData.name },
@@ -88,7 +94,6 @@ export const registerService = async (body: RegisterUser) => {
       await tx.userPoint.create({
          data: {
             userId: newUser.id,
-            expiredAt: new Date(),
             amount: 0,
          },
       });

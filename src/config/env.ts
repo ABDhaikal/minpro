@@ -24,7 +24,7 @@ export const LOGIN_EXPIRATION = "2h"
 // forgot password
 export const FORGOT_PASSWORD_EXPIRATION = "2h";
 
-export const APP_URL = "https://www.google.com/";
+export const APP_URL = "https://www.google.com";
 export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;

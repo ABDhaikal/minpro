@@ -25,14 +25,18 @@ export const validateRegister = [
       ),
    (req: Request, res: Response, next: NextFunction) => {
       const err = validationResult(req);
-      const requeredFields = [
-         "name",
-         "description",
-         "bankTarget",
-         "paymentTarget",
-      ];
 
-      if (req.body.organizerData) {
+      if (req.body.organizerData && req.body.organizerData.name) {
+         if (typeof req.body.organizerData.paymentTarget !== "number") {
+            throw new ApiError("Payment target must be a number", 400);
+         }
+
+         const requeredFields = [
+            "name",
+            "description",
+            "bankTarget",
+            "paymentTarget",
+         ];
          const Errordata = [];
          for (const field of requeredFields) {
             if (!req.body.organizerData[field]) {
@@ -46,6 +50,7 @@ export const validateRegister = [
             );
          }
       }
+
       if (!err.isEmpty()) {
          throw new ApiError(err.array()[0].msg, 400);
       }
@@ -73,3 +78,4 @@ export const validateLogin = [
       next();
    },
 ];
+

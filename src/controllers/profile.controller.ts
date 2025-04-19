@@ -11,10 +11,11 @@ export const UpdateProfileController = async (
    try {
       const authUserId = res.locals.user.id;
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const picture = files.profilePict?.[0];
       const user = await updateProfileService(
          authUserId,
          req.body,
-         files.profilePict?.[0]
+         picture
       );
       res.status(200).json(user);
    } catch (error) {
@@ -30,10 +31,8 @@ export const updateProfilePictController = async (
    try {
       const authUserId = res.locals.user.id;
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      const user = await updateProfilePictService(
-         authUserId,
-         files.profilePict?.[0]
-      );
+      const picture = files.profilePict?.[0];
+      const user = await updateProfilePictService(authUserId, picture);
       res.status(200).json(user);
    } catch (error) {
       return next(error);
@@ -48,15 +47,14 @@ export const updateOrganizerController = async (
    try {
       const authUserId = res.locals.user.id;
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const picture = files.picture?.[0];
       const user = await updateOrganizerService(
          authUserId,
          req.body,
-         files.profilePict?.[0]
+         picture
       );
       res.status(200).json(user);
    } catch (error) {
       return next(error);
    }
 };
-
-
