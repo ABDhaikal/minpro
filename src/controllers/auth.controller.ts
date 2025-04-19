@@ -75,6 +75,7 @@ export const updatePasswordController = async (
             tokenForget,
             req.body.newPassword
          );
+         res.status(200).json(result);
       }
    } catch (error) {
       return next(error);

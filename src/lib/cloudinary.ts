@@ -43,11 +43,8 @@ export const cloudinaryUpload = (
   });
 };
 
-const extractPublicIdFromUrl = (url: string) => {
-  const urlParts = url.split("/");
-  const publicIdWithExtension = urlParts[urlParts.length - 1];
-  const publicId = publicIdWithExtension.split(".")[0];
-  return publicId;
+const extractPublicIdFromUrl = (secureUrl: string): string => {
+  return secureUrl.replace(/^.*\/upload\/v\d+\//, "").replace(/\.[^.]+$/, "");
 };
 
 export const cloudinaryRemove = async (secureUrl: string) => {

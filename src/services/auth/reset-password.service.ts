@@ -42,5 +42,7 @@ export const resetPasswordService = async (
    if (!updatePassword) {
       throw new ApiError("Failed to update password", 500);
    }
+
+   
    return "Password updated successfully";
 };
