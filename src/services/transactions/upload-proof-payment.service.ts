@@ -1,4 +1,5 @@
 import prisma from "../../config/prisma";
+import { userTransactionProofQueue } from "../../jobs/queue/transaction-proof.queue";
 import { cloudinaryUpload } from "../../lib/cloudinary";
 import { ApiError } from "../../utils/api-error";
 
@@ -8,6 +9,9 @@ export const uploadPaymentProofService = async (
   imageTransactionFile: Express.Multer.File
 ) => {
   try {
+    if(!imageTransactionFile) {
+      throw new ApiError("Payment proof is required", 400);
+    }
     const transaction = await prisma.transaction.findUnique({
       where: { id: transactionId },
     });
@@ -27,29 +31,12 @@ export const uploadPaymentProofService = async (
       );
     }
 
-    let secureUrl: string;
-    try {
-      const uploadResult = await cloudinaryUpload(
-        imageTransactionFile,
-        "payment-proofs"
-      );
-      secureUrl = uploadResult.secure_url;
-    } catch (uploadError) {
-      console.error("Cloudinary upload failed:", uploadError);
-      throw new ApiError("Failed to upload payment proof to Cloudinary", 500);
-    }
-
-    const updatedTransaction = await prisma.transaction.update({
-      where: { id: transactionId },
-      data: {
-        paymentProof: secureUrl,
-        status: "WAITING_FOR_ADMIN_CONFIRMATION",
-      },
+    await userTransactionProofQueue.add("uploadPaymentproof", {
+      transactionId,
+      imageTransactionFile,
     });
-
     return {
       message: "Payment proof uploaded succesfully",
-      data: updatedTransaction,
     };
   } catch (error) {
     console.error("Error uploading payment proof", error);

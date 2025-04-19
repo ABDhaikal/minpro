@@ -6,6 +6,7 @@ import { validateCreateTransaction } from "../validators/transaction.validator";
 import multer from "multer"
 
 
+
 const router = Router();
 
 const upload = multer({storage: multer.memoryStorage()})
@@ -19,9 +20,8 @@ router.post(
 );
 
 router.post(
-    "/transactions/:transactioId/payment-proof",
+    "/payment-proof/:transactionId",
     verifyToken,
-    verifyRole(["USER"]),
     upload.single("imageTransaction"),
     uploadPaymentProofController
   );

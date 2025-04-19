@@ -36,7 +36,6 @@ export const uploadPaymentProofController = async (
     const { transactionId } = req.params;
     const authUserId = res.locals.user.id;
 
-    // Panggil service untuk mengunggah bukti pembayaran
     const result = await uploadPaymentProofService(
       transactionId,
       authUserId,

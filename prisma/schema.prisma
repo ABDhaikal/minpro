@@ -113,8 +113,8 @@ model CuponDiscount {
   deletedAt DateTime?
 
   // relation
-  users             User              @relation(fields: [userId], references: [id])
-  cuponTransactions CuponTransaction?
+  users             User               @relation(fields: [userId], references: [id])
+  cuponTransactions CuponTransaction[]
 
   @@map("cupon_discounts")
 }
@@ -126,14 +126,15 @@ enum DiscountType {
 
 model CuponTransaction {
   id            String   @id @default(uuid()) // Primary Key
-  cuponId       String   @unique
+  cuponId       String
   transactionId String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   // relation
-  cupons       CuponDiscount @relation(fields: [cuponId], references: [id])
-  transactions Transaction   @relation(fields: [transactionId], references: [id])
+  transactions    Transaction    @relation(fields: [transactionId], references: [id])
+  CuponDiscount   CuponDiscount? @relation(fields: [cuponDiscountId], references: [id])
+  cuponDiscountId String?
 
   @@map("cupon_transactions")
 }
@@ -311,6 +312,7 @@ model transactionTicket {
   transactionId String
   ticketId      String
   amount        Int
+  price         Float
   createdAt     DateTime  @default(now())
   deletedAt     DateTime?
 
