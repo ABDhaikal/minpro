@@ -16,32 +16,6 @@ interface ICreateTransactionService {
   pointsUsed: number;
 }
 
-// kalau mau hit
-
-/*
-post 
-
-{
-  "cuponID" : ["A12131","B123123","C123123"] 
-  "voucherID" : "asd12w"
-  "tickets" : 
-            [
-            {
-            "ticketId" : "VIP123123"
-            "amount" : 10
-            },
-            {
-            "ticketId" : "Regular123123"
-            "amount" : 5
-            }
-            ]
-}
-
-
-
-*/
-
-
 export const createTransactionService = async (
   body: ICreateTransactionService,
   authUserId: string
