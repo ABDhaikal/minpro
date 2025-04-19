@@ -55,18 +55,20 @@ model UserPoint {
 }
 
 model Transaction {
-  id                String            @id @default(uuid())
-  userId            String
-  status            TransactionStatus
-  pointsUsed        Int
-  totalPrice        Int
-  paymentDeadline   DateTime
-  paymentProof      String?
-  organizerDeadline DateTime?
-  transactionDetail String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  deletedAt         DateTime?
+  id                    String            @id @default(uuid())
+  userId                String
+  status                TransactionStatus @default(WAITING_FOR_PAYMENT)
+  pointsUsed            Int
+  totalDecreaseDiscount Int
+  totalPercentDiscount  Int
+  totalPrice            Int
+  paymentDeadline       DateTime
+  paymentProof          String?
+  organizerDeadline     DateTime?
+  transactionDetail     String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  deletedAt             DateTime?
 
   // relation
   users              User                 @relation(fields: [userId], references: [id])
@@ -157,19 +159,19 @@ model Organizer {
 }
 
 model Event {
-  id          String    @id @default(cuid()) //primary key
+  id          String      @id @default(cuid()) //primary key
   organizerId String
   category    Category
   imageId     String?
   name        String
-  slug        String    @unique
+  slug        String      @unique
   description String
   location    Location
   status      StatusEvent @default(DRAFT)
   eventStart  DateTime
   eventEnd    DateTime
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   deletedAt   DateTime?
 
   //relation
@@ -254,7 +256,7 @@ model Ticket {
   id        String    @id @default(cuid()) //primary key
   eventId   String
   name      String
-  price     String
+  price     Float     @default(0)
   amount    Int
   buyed     Int
   createdAt DateTime  @default(now())
@@ -271,15 +273,15 @@ model Ticket {
 }
 
 model EventVoucher {
-  id        String    @id @default(cuid()) //primary key
-  eventId   String
-  name      String
-  amount    Int
-  quota     Int
-  used      Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id             String    @id @default(cuid()) //primary key
+  eventId        String
+  name           String
+  amountDiscount Int
+  quota          Int
+  used           Int
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
 
   //relation
   events             Event                @relation(fields: [eventId], references: [id])

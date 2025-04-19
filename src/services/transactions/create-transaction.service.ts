@@ -1,102 +1,245 @@
-// import { Ticket, Transaction, TransactionStatus } from "@prisma/client";
-// import prisma from "../../config/prisma";
-// import { ApiError } from "../../utils/api-error";
-// import { Backoffs } from "bullmq";
-// import { userTransactionQueue } from "../../jobs/queue/transaction.queue";
+import { EXPIRED_PAYMENT_DEADLINE_HOUR } from "../../config/env";
+import prisma from "../../config/prisma";
+import { userTransactionQueue } from "../../jobs/queue/transaction.queue";
+import { ApiError } from "../../utils/api-error";
 
-// interface Iticket {
-//   ticketId: string;
-//   amount: number;
-// }
+interface Iticket {
+  ticketId: string;
+  amount: number;
+}
 
-// interface ICreateTransactionService {
-//   cuponID: string[];
-//   tickets: Iticket[];
-//   pointsUsed: number;
-// }
-// export const createTransactionService = async (
-//   body: ICreateTransactionService,
-//   authUserId: string
-// ) => {
-//   // ngecek user yang mau transaksi bener apa engga (ngecek auth)
+interface ICreateTransactionService {
+  cuponID: string[] | undefined;
+  voucherID: string | undefined;
+  tickets: Iticket[];
 
-//   // ngecek cuponya ada apa engga
-//   // ngecek kuponya punya user yang login bukan
-//   // ngecek pointused mencukupi apa engga
+  pointsUsed: number;
+}
 
-//   // ngecek tiketnya ada apa engga
-//   // ngecek daftar tiketnya dari event yang sama engga
-//   // ngecek daftar tiketnya tersedia apa engga
-//   // jumlah semua harga dikali jumlah ticket yang mau dibeli
+// kalau mau hit
 
-//   // njumlah diskon dari kupon
-//   //bikin total harga yang sudah dikurangi diskon
-//   // menentukan deadline payment proof
-//   // nambah data buyed di semua tiket yang mau dibeli
+/*
+post 
 
-//   // bikin table transaski
-//   // bikin table transaction ticket dari tickets
-//   // bikin table cupon transaction
+{
+  "cuponID" : ["A12131","B123123","C123123"] 
+  "voucherID" : "asd12w"
+  "tickets" : 
+            [
+            {
+            "ticketId" : "VIP123123"
+            "amount" : 10
+            },
+            {
+            "ticketId" : "Regular123123"
+            "amount" : 5
+            }
+            ]
+}
 
-//   // bikin antrian redis
 
-//   const user = await prisma.user.findUnique({
-//     where: { id: authUserId },
-//   });
 
-//   if (body.cuponID) {
-//     const cupon = await prisma.cuponDiscount.findMany({
-//       where: { id: authUserId },
-//     });
-//     if (!body.cuponID) {
-//       throw new ApiError("Cupon not found", 404);
-//     }
-//   }
+*/
 
-//   if (!user) {
-//     throw new ApiError("User not found", 404);
-//   }
 
-//   const newTransaction = await prisma.$transaction(async (tx) => {
-//     //kalo user mau pake point??
-//     if (body.pointsUsed > 0) {
-//       const updatedUser = await tx.user.update({
-//         where: { id: authUserId },
-//         data: { point: { decrement: body.pointsUsed } },
-//       });
+export const createTransactionService = async (
+  body: ICreateTransactionService,
+  authUserId: string
+) => {
+  const resut = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { id: authUserId },
+    });
 
-//       if (updatedUser.point < 0) {
-//         throw new ApiError("Insufficient points", 400);
-//       }
-//     }
+    if (!user) {
+      throw new ApiError("User not found", 404);
+    }
 
-//     return await tx.transaction.create({
-//       data: {
-//         userId: authUserId,
-//         status: TransactionStatus.WAITING_FOR_ADMIN_CONFIRMATION, //tidak ada PENDING??
-//         pointsUsed: body.pointsUsed,
-//         totalPrice: body.totalPrice,
-//         paymentDeadline: body.paymentDeadline,
-//       },
-//     });
-//   });
+    let discountPercent = 1;
+    let discountdecrease = 0;
+    if (body.cuponID && body.cuponID.length > 0) {
+      body.cuponID.map(async (cuponWant2use) => {
+        const data = await tx.cuponDiscount.findFirst({
+          where: { userId: authUserId, id: cuponWant2use, deletedAt: null },
+        });
+        if (!data) {
+          throw new ApiError("Cupon not found", 404);
+        }
+        if (data.type === "FIXED_AMOUNT") {
+          discountdecrease += data.amount;
+        }
+        if (data.type === "PERCENTAGE") {
+          const pengkalinya = 1 - data.amount / 100;
+          const yangharusdibayar = discountPercent * pengkalinya;
+          discountPercent = yangharusdibayar;
+        }
+        await tx.cuponDiscount.update({
+          where: {
+            id: data.id,
+          },
+          data: { deletedAt: new Date() },
+        });
+      });
+    }
 
-//   await userTransactionQueue.add(
-//     "new-transaction",
-//     {
-//       uuid: newTransaction.id,
-//     },
-//     {
-//       jobId: newTransaction.id,
-//       delay: 2 * 60000,
-//       removeOnComplete: true,
-//       attempts: 5,
-//       backoff: {
-//         type: "exponential",
-//         delay: 1000,
-//       },
-//     }
-//   );
+    let totalPrice = 0;
+    let eventid = "";
 
-//   return { messaage: "Transaction created successfully", data: newTransaction };
-// };
+    body.tickets.map(async (ticketsFinding) => {
+      const data = await tx.ticket.findFirst({
+        where: { id: ticketsFinding.ticketId, deletedAt: null },
+        include: {
+          events: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+      if (!data) {
+        throw new ApiError("Ticket not found", 404);
+      }
+      const available = data.amount - data.buyed;
+      if (available < ticketsFinding.amount) {
+        throw new ApiError("Ticket not available", 403);
+      }
+      if (eventid === "") {
+        eventid = data.events.id as string;
+      } else if (data.events.id !== eventid) {
+        throw new ApiError(
+          "system not provide buying ticket with different event"
+        );
+      }
+
+      await tx.ticket.update({
+        where: {
+          id: data.id,
+        },
+        data: {
+          buyed: {
+            increment: ticketsFinding.amount,
+          },
+        },
+      });
+      totalPrice += ticketsFinding.amount * data.price;
+    });
+
+    if (body.voucherID && body.voucherID !== "") {
+      if (typeof body.voucherID !== "string") {
+        throw new ApiError("voucher id must be string");
+      }
+
+      const validatingVoucher = await tx.eventVoucher.findFirst({
+        where: {
+          id: body.voucherID,
+          deletedAt: null,
+        },
+      });
+
+      if (!validatingVoucher) {
+        throw new ApiError("voucher not found", 404);
+      }
+
+      if (validatingVoucher.quota === validatingVoucher.used) {
+        throw new ApiError("voucher is sold", 404);
+      }
+
+      if (validatingVoucher.eventId !== eventid) {
+        throw new ApiError("voucher not provide for this transaction", 401);
+      }
+
+      await tx.eventVoucher.update({
+        where: {
+          id: body.voucherID,
+        },
+        data: {
+          used: {
+            increment: 1,
+          },
+        },
+      });
+
+      discountdecrease += validatingVoucher.amountDiscount;
+    }
+
+    totalPrice = (totalPrice - discountdecrease) * discountPercent;
+
+    const newTransaction = await tx.transaction.create({
+      data: {
+        userId: authUserId,
+        pointsUsed: body.pointsUsed,
+        totalPrice: totalPrice,
+        totalDecreaseDiscount: discountdecrease,
+        totalPercentDiscount: discountPercent,
+        paymentDeadline: new Date(
+          Date.now() + EXPIRED_PAYMENT_DEADLINE_HOUR * 60 * 60 * 1000
+        ),
+      },
+    });
+
+    // bikin tabel voucher_transaction id transactionnya dari newTransaction
+
+    if (body.voucherID) {
+      const createTransaction = await tx.voucherTransaction.create({
+        data: {
+          transactionId: newTransaction.id,
+          eventVoucherId: body.voucherID,
+        },
+      });
+      if (!createTransaction) {
+        throw new ApiError("Failed to create voucher transaction", 501);
+      }
+    }
+    // bikin tabel ticket_transaction id transactionnya dari newTransaction
+
+    if (body.tickets) {
+      body.tickets.map(async (ticket) => {
+        const createTicket = await tx.transactionTicket.create({
+          data: {
+            transactionId: newTransaction.id,
+            ticketId: ticket.ticketId,
+            amount: ticket.amount,
+          },
+        });
+        if (!createTicket) {
+          throw new ApiError("Failed to create voucher transaction", 501);
+        }
+      });
+    }
+    if (body.cuponID) {
+      body.cuponID.map(async (cupon) => {
+        const createCupon= await tx.cuponTransaction.create({
+          data: {
+            cuponId: cupon,
+            transactionId: newTransaction.id
+          },
+        });
+        if (!createCupon) {
+          throw new ApiError("Failed to create voucher transaction", 501);
+        }
+      });
+    }
+
+    await userTransactionQueue.add(
+      "new-transaction",
+      {
+        uuid: newTransaction.id,
+      },
+      {
+        jobId: newTransaction.id,
+        delay: 2 * 60000,
+        removeOnComplete: true,
+        attempts: 5,
+        backoff: {
+          type: "exponential",
+          delay: 1000,
+        },
+      }
+    );
+
+    return {
+      messaage: "Transaction created successfully wait payment proof in 2 hour",
+    };
+  });
+  return resut;
+};
