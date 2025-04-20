@@ -53,18 +53,20 @@ model UserPoint {
 }
 
 model Transaction {
-  id                String            @id @default(uuid())
-  userId            String
-  status            TransactionStatus
-  pointsUsed        Int
-  totalPrice        Int
-  paymentDeadline   DateTime
-  paymentProof      String?
-  organizerDeadline DateTime?
-  transactionDetail String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  deletedAt         DateTime?
+  id                    String            @id @default(uuid())
+  userId                String
+  status                TransactionStatus @default(WAITING_FOR_PAYMENT)
+  pointsUsed            Int
+  totalDecreaseDiscount Int
+  totalPercentDiscount  Int
+  totalPrice            Int
+  paymentDeadline       DateTime
+  paymentProof          String?
+  organizerDeadline     DateTime?
+  transactionDetail     String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  deletedAt             DateTime?
 
   // relation
   users              User                 @relation(fields: [userId], references: [id])
@@ -109,8 +111,8 @@ model CuponDiscount {
   deletedAt DateTime?
 
   // relation
-  users             User              @relation(fields: [userId], references: [id])
-  cuponTransactions CuponTransaction?
+  users             User               @relation(fields: [userId], references: [id])
+  cuponTransactions CuponTransaction[]
 
   @@map("cupon_discounts")
 }
@@ -121,15 +123,17 @@ enum DiscountType {
 }
 
 model CuponTransaction {
-  id            String   @id @default(uuid()) // Primary Key
-  cuponId       String   @unique
-  transactionId String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String       @id @default(uuid()) // Primary Key
+  transactionId   String
+  cuponDiscountId String
+  type            DiscountType 
+  amount          Int 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // relation
-  cupons       CuponDiscount @relation(fields: [cuponId], references: [id])
-  transactions Transaction   @relation(fields: [transactionId], references: [id])
+  transactions  Transaction   @relation(fields: [transactionId], references: [id])
+  CuponDiscount CuponDiscount @relation(fields: [cuponDiscountId], references: [id])
 
   @@map("cupon_transactions")
 }
@@ -155,19 +159,19 @@ model Organizer {
 }
 
 model Event {
-  id          String    @id @default(cuid()) //primary key
+  id          String      @id @default(cuid()) //primary key
   organizerId String
   category    Category
   imageId     String?
   name        String
-  slug        String    @unique
+  slug        String      @unique
   description String
   location    Location
   status      StatusEvent @default(DRAFT)
   eventStart  DateTime
   eventEnd    DateTime
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   deletedAt   DateTime?
 
   //relation
@@ -252,7 +256,7 @@ model Ticket {
   id        String    @id @default(cuid()) //primary key
   eventId   String
   name      String
-  price     String
+  price     Float     @default(0)
   amount    Int
   buyed     Int
   createdAt DateTime  @default(now())
@@ -269,15 +273,15 @@ model Ticket {
 }
 
 model EventVoucher {
-  id        String    @id @default(cuid()) //primary key
-  eventId   String
-  name      String
-  amount    Int
-  quota     Int
-  used      Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id             String    @id @default(cuid()) //primary key
+  eventId        String
+  name           String
+  amountDiscount Int
+  quota          Int
+  used           Int
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
 
   //relation
   events             Event                @relation(fields: [eventId], references: [id])
@@ -307,6 +311,7 @@ model transactionTicket {
   transactionId String
   ticketId      String
   amount        Int
+  price         Float
   createdAt     DateTime  @default(now())
   deletedAt     DateTime?
 

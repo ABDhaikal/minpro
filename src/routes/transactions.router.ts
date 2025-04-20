@@ -1,29 +1,29 @@
-// import { Router } from "express";
-// import { createTransactionController, uploadPaymentProofController } from "../controllers/transactions.controller";
-// import { verifyToken } from "../lib/jwt";
-// import { verifyRole } from "../middlewares/role.middleware";
-// import { validateCreateTransaction } from "../validators/transaction.validator";
-// import multer from "multer"
+import { Router } from "express";
+import { createTransactionController, uploadPaymentProofController } from "../controllers/transactions.controller";
+import { verifyToken } from "../lib/jwt";
+import { verifyRole } from "../middlewares/role.middleware";
+import { validateCreateTransaction } from "../validators/transaction.validator";
+import multer from "multer"
 
 
-// const router = Router();
 
-// const upload = multer({storage: multer.memoryStorage()})
+const router = Router();
 
-// router.post(
-//   "/",
-//   verifyToken,
-//   verifyRole(["USER"]),
-//   validateCreateTransaction,
-//   createTransactionController
-// );
+const upload = multer({storage: multer.memoryStorage()})
 
-// router.post(
-//     "/transactions/:transactioId/payment-proof",
-//     verifyToken,
-//     verifyRole(["USER"]),
-//     upload.single("imageTransaction"),
-//     uploadPaymentProofController
-//   );
+router.post(
+  "/",
+  verifyToken,
+  verifyRole(["USER"]),
+  validateCreateTransaction,
+  createTransactionController
+);
 
-// export default router;
+router.post(
+    "/payment-proof/:transactionId",
+    verifyToken,
+    upload.single("imageTransaction"),
+    uploadPaymentProofController
+  );
+
+export default router;

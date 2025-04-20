@@ -9,9 +9,11 @@ import profileRouter from "./routes/profile.router";
 
 import "./jobs";
 
+import "./jobs";
+
 // define your routes here
 import authRouter from "./routes/auth.router";
-// import transactionsRouter from "./routes/transactions.router";
+import transactionsRouter from "./routes/transactions.router";
 
 // define the express app
 const app = express();
@@ -23,7 +25,7 @@ app.use(express.json());
 app.use("/events", eventsRouter);
 app.use("/carts", cartsRouter);
 app.use("/auth", authRouter);
-// app.use("/transactions", transactionsRouter);
+app.use("/transactions", transactionsRouter);
 app.use("/profile", profileRouter);
 
 // app.use("/examples", exampleRouter);
@@ -33,5 +35,5 @@ app.use("/events", eventsRouter); // example route
 app.use(errorMiddleware);
 // listening to the server
 app.listen(PORT, () => {
-   console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Server is running at http://localhost:${PORT}`);
 });

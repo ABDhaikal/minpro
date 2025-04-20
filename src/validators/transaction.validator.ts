@@ -3,9 +3,7 @@ import { body, validationResult } from "express-validator";
 import { ApiError } from "../utils/api-error";
 
 export const validateCreateTransaction = [
-  body("ticketId").notEmpty().withMessage("ticketId is required"),
-  body("amount").notEmpty().withMessage("amount is required"),
-
+  body("tickets").notEmpty().withMessage("ticketId is required"),
   (req: Request, _res: Response, next: NextFunction) => {
     const errors = validationResult(req);
 
