@@ -63,6 +63,7 @@ export const userTransactionWorker = new Worker(
                      transactionId: transaction.id,
                   },
                });
+               
                if (validatingVoucher) {
                   const updateVoucherData = await tx.eventVoucher.update({
                      where: {
