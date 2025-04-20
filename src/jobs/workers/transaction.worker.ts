@@ -8,15 +8,14 @@ export const userTransactionWorker = new Worker(
    "user-transaction-queue",
    async (job) => {
       try {
-         console.log("worker jalan");
-         const uuid = job.data.uuid;
+         const reciptNumber = job.data.reciptNumber;
 
-         if (!uuid) {
-            throw new ApiError("Invalid job data: missing UUID", 400);
+         if (!reciptNumber) {
+            throw new ApiError("Invalid job data: missing reciptNumber", 400);
          }
 
          const transaction = await prisma.transaction.findUnique({
-            where: { id: uuid },
+            where: { reciptNumber: reciptNumber },
             include: {
                transactionTicket: true,
                cuponTransactions: true,
@@ -24,14 +23,14 @@ export const userTransactionWorker = new Worker(
          });
 
          if (!transaction) {
-            throw new ApiError("Invalid transaction UUID", 400);
+            throw new ApiError("Invalid transaction reciptNumber", 400);
          }
 
          if (transaction.status === "WAITING_FOR_PAYMENT") {
             await prisma.$transaction(async (tx) => {
                // kalau tidak update ke expired
                await tx.transaction.update({
-                  where: { id: uuid },
+                  where: { reciptNumber: reciptNumber },
                   data: { status: "EXPIRED" },
                });
 
@@ -42,15 +41,15 @@ export const userTransactionWorker = new Worker(
                ) {
                   await Promise.all(
                      transaction.transactionTicket.map(async (ticket) => {
-                        if (!ticket.amount || ticket.amount <= 0) {
+                        if (!ticket.quantity || ticket.quantity <= 0) {
                            throw new ApiError(
-                              `Invalid ticket amount for ticket ID: ${ticket.ticketId}`,
+                              `Invalid ticket quantity for ticket ID: ${ticket.ticketId}`,
                               400
                            );
                         }
                         await tx.ticket.update({
                            where: { id: ticket.ticketId },
-                           data: { buyed: { decrement: ticket.amount } },
+                           data: { buyed: { decrement: ticket.quantity } },
                         });
                      })
                   );
@@ -61,12 +60,11 @@ export const userTransactionWorker = new Worker(
                // balikin buyed voucher
                const validatingVoucher = await tx.voucherTransaction.findFirst({
                   where: {
-                     transactionId: uuid,
+                     transactionId: transaction.id,
                   },
                });
-
                if (validatingVoucher) {
-                  const updateVoucherData = tx.eventVoucher.update({
+                  const updateVoucherData = await tx.eventVoucher.update({
                      where: {
                         id: validatingVoucher.eventVoucherId,
                      },
@@ -90,7 +88,7 @@ export const userTransactionWorker = new Worker(
                      transaction.cuponTransactions.map(async (cupon) => {
                         await tx.cuponDiscount.update({
                            where: { id: cupon.cuponDiscountId },
-                           data: { deletedAt: null },
+                           data: { used: { decrement: 1 } },
                         });
                      })
                   );
@@ -108,8 +106,7 @@ export const userTransactionWorker = new Worker(
             });
          }
       } catch (error) {
-         console.log("Error processing transaction job:", 401);
-         throw error;
+         throw new ApiError("Error processing transaction job:", 401);
       }
    },
    { connection: redisConnection }

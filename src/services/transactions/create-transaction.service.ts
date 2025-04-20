@@ -54,14 +54,14 @@ export const createTransactionService = async (
                      userId: authUserId,
                      id: cuponWant2use,
                      deletedAt: null,
-                     expiredAt: {
-                        lte: new Date(),
-                     },
                   },
                });
 
                if (!data) {
                   throw new ApiError("Cupon not found", 404);
+               }
+               if (data.used >= data.quantity) {
+                  throw new ApiError("Cupon has reached its limit", 403);
                }
 
                if (data.type === "FIXED_AMOUNT") {
@@ -76,7 +76,7 @@ export const createTransactionService = async (
                   where: {
                      id: data.id,
                   },
-                  data: { deletedAt: new Date() },
+                  data: { used: { increment: 1 } },
                });
             })
          );
@@ -227,7 +227,7 @@ export const createTransactionService = async (
                data: {
                   transactionId: newTransaction.id,
                   ticketId: ticket.ticketId,
-                  amount: ticket.amount,
+                  quantity: ticket.amount,
                   price: data.price,
                },
             });
@@ -237,16 +237,14 @@ export const createTransactionService = async (
          })
       );
 
-      if (body.cuponID) {
+      if (body.cuponID && body.cuponID.length > 0) {
          await Promise.all(
-            body.cuponID.map(async (cupon) => {
+            body.cuponID.map(async (cuponWant2use) => {
                const data = await tx.cuponDiscount.findFirst({
                   where: {
-                     id: cupon,
+                     userId: authUserId,
+                     id: cuponWant2use,
                      deletedAt: null,
-                     expiredAt: {
-                        lte: new Date(),
-                     },
                   },
                });
                if (!data) {
@@ -254,7 +252,7 @@ export const createTransactionService = async (
                }
                const createCupon = await tx.cuponTransaction.create({
                   data: {
-                     cuponDiscountId: cupon,
+                     cuponDiscountId: cuponWant2use,
                      transactionId: newTransaction.id,
                      amount: data.amount,
                      type: data.type,
@@ -262,7 +260,7 @@ export const createTransactionService = async (
                });
                if (!createCupon) {
                   throw new ApiError(
-                     "Failed to create voucher transaction",
+                     "Failed to create cupon transaction",
                      501
                   );
                }
@@ -273,7 +271,7 @@ export const createTransactionService = async (
       await userTransactionQueue.add(
          "new-transaction",
          {
-            uuid: newTransaction.id,
+            reciptNumber: newTransaction.reciptNumber,
          },
          {
             jobId: newTransaction.id,
@@ -293,6 +291,5 @@ export const createTransactionService = async (
       };
    });
 
-   console.log(`Transaction created with ID: ${result?.messaage}`);
    return result;
 };
