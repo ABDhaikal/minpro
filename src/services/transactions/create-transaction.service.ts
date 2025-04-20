@@ -277,8 +277,7 @@ export const createTransactionService = async (
          },
          {
             jobId: newTransaction.id,
-            // delay: EXPIRED_PAYMENT_DEADLINE_HOUR * 60 * 60 * 1000,
-            delay: 1 * 60 * 1000,
+            delay: EXPIRED_PAYMENT_DEADLINE_HOUR * 60 * 60 * 1000,
             removeOnComplete: true,
             attempts: 5,
             backoff: {
