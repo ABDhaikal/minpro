@@ -155,8 +155,8 @@ model Organizer {
   deletedAt        DateTime?
 
   //relation
-  Event Event[]
-  user  User    @relation(fields: [userId], references: [id])
+  events Event[]
+  users  User    @relation(fields: [userId], references: [id])
 
   @@map("organizers")
 }
@@ -179,9 +179,9 @@ model Event {
 
   //relation
   organizers   Organizer      @relation(fields: [organizerId], references: [id])
-  EventVoucher EventVoucher[]
-  Image        Image[]
-  Ticket       Ticket[]
+  eventVoucher EventVoucher[]
+  images        Image[]
+  tickets       Ticket[]
   usersEvents  usersEvents[]
 
   @@map("events")
@@ -345,6 +345,8 @@ model usersEvents {
   id        String    @id @default(cuid()) //primary key
   userId    String
   eventId   String
+  review     String?
+  rating     Int?
   updateAt  DateTime  @updatedAt
   createdAt DateTime  @default(now())
   deletedAt DateTime?
@@ -361,7 +363,7 @@ model userEventTicket {
   id          String    @id @default(cuid()) //primary key
   userEventId String
   ticketId    String
-  quantitiy      Int
+  quantity      Int
   createdAt   DateTime  @default(now())
   deletedAt   DateTime?
 

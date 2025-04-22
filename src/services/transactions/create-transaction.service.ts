@@ -195,6 +195,7 @@ export const createTransactionService = async (
             pointsUsed: body.pointsUsed,
             totalPrice: totalPrice,
             totalDecreaseDiscount: discountdecrease,
+            status: "WAITING_FOR_PAYMENT",
             totalPercentDiscount: (1 - discountPercent) * 100,
             paymentDeadline: new Date(
                Date.now() + EXPIRED_PAYMENT_DEADLINE_HOUR * 60 * 60 * 1000
@@ -259,10 +260,7 @@ export const createTransactionService = async (
                   },
                });
                if (!createCupon) {
-                  throw new ApiError(
-                     "Failed to create cupon transaction",
-                     501
-                  );
+                  throw new ApiError("Failed to create cupon transaction", 501);
                }
             })
          );
