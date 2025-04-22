@@ -4,9 +4,9 @@ import { ApiError } from "../../utils/api-error";
 export const getCartService = async (userId: string) => {
   const carts = await prisma.organizer.findMany({
     where: {
-      Event: {
+      events: {
         some: {
-          Ticket: {
+          tickets: {
             some: {
               Cart: {
                 some: {
@@ -22,9 +22,9 @@ export const getCartService = async (userId: string) => {
       id: true,
       name: true,
       organizerPicture: true,
-      Event: {
+      events: {
         where: {
-          Ticket: {
+          tickets: {
             some: {
               Cart: {
                 some: {
@@ -41,7 +41,7 @@ export const getCartService = async (userId: string) => {
           deletedAt: true,
         },
         include: {
-          Ticket: {
+          tickets: {
             omit: {
               eventId: true,
               createdAt: true,

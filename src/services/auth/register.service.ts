@@ -115,6 +115,8 @@ export const registerService = async (body: RegisterUser) => {
             data: {
                userId: newUser.id,
                amount: CUPON_DISCOUNT_AMOUNT,
+               quantity: 1,
+               used: 0,
                type: CUPON_DISCOUNT_TYPE,
                expiredAt: new Date(
                   new Date().setMonth(new Date().getMonth() + CUPON_EXP_MONTHS)

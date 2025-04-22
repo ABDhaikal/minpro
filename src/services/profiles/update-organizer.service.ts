@@ -14,14 +14,14 @@ export const updateOrganizerService = async (
          userId: senderId,
       },
       include: {
-         user: {
+         users: {
             select: {
                deletedAt: true,
             },
          },
       },
    });
-   if (!validdatingOrganizer || validdatingOrganizer.user.deletedAt) {
+   if (!validdatingOrganizer || validdatingOrganizer.users.deletedAt) {
       throw new ApiError("Organizer not found", 404);
    }
 

@@ -3,47 +3,67 @@ import { createTransactionService } from "../services/transactions/create-transa
 import { uploadPaymentProofService } from "../services/transactions/upload-proof-payment.service";
 import multer from "multer";
 import { ApiError } from "../utils/api-error";
+import { acceptingTransactionService } from "../services/transactions/accepting-transaction.service";
 
 export const createTransactionController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+   req: Request,
+   res: Response,
+   next: NextFunction
 ) => {
-  try {
-    const result = await createTransactionService(
-      req.body,
-      String(res.locals.user.id)
-    );
-    res.status(200).send(result);
-  } catch (error) {
-    next(error);
-  }
+   try {
+      const result = await createTransactionService(
+         req.body,
+         String(res.locals.user.id)
+      );
+      res.status(200).send(result);
+   } catch (error) {
+      next(error);
+   }
 };
 
-
 export const uploadPaymentProofController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+   req: Request,
+   res: Response,
+   next: NextFunction
 ) => {
-  try {
-    const file = req.file as Express.Multer.File;
+   try {
+      const file = req.file as Express.Multer.File;
 
-    if (!file) {
-      throw new ApiError("No file uploaded", 400)
-    }
+      if (!file) {
+         throw new ApiError("No file uploaded", 400);
+      }
 
-    const { transactionId } = req.params;
-    const authUserId = res.locals.user.id;
+      const { transactionId } = req.params;
+      const authUserId = res.locals.user.id;
 
-    const result = await uploadPaymentProofService(
-      transactionId,
-      authUserId,
-      file
-    );
+      const result = await uploadPaymentProofService(
+         transactionId,
+         authUserId,
+         file
+      );
 
-    res.status(201).send(result);
-  } catch (error: any) {
-    next(error);
-  }
+      res.status(201).send(result);
+   } catch (error: any) {
+      next(error);
+   }
+};
+
+export const acceptingTransactionController = async (
+   req: Request,
+   res: Response,
+   next: NextFunction
+) => {
+   try {
+      const { reciptNumber } = req.params;
+      const authUserId = res.locals.user.id;
+
+      const result = await acceptingTransactionService(
+         reciptNumber,
+         authUserId
+      );
+
+      res.status(200).send(result);
+   } catch (error) {
+      next(error);
+   }
 };

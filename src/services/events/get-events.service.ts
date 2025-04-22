@@ -37,7 +37,7 @@ export const getEventsService = async (queries: GetEventsService) => {
     skip: (page - 1) * take,
     orderBy: { [sortBy]: sortOrder },
     include: {
-      Image: {
+      images: {
         where: {
           isThumbnail: true,
         },

@@ -6,7 +6,7 @@ export const getEventService = async (slug: string) => {
   const event = await prisma.event.findUnique({
     where: { slug },
     include: {
-      Ticket: true,
+      tickets: true,
       organizers: {
         select: {
             id: true,
@@ -14,7 +14,7 @@ export const getEventService = async (slug: string) => {
             organizerPicture: true,
         }
       },
-      Image: {
+      images: {
         select: {
           id: true,
           imageUrl: true,
