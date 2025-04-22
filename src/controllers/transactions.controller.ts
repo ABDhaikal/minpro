@@ -4,6 +4,7 @@ import { uploadPaymentProofService } from "../services/transactions/upload-proof
 import multer from "multer";
 import { ApiError } from "../utils/api-error";
 import { acceptingTransactionService } from "../services/transactions/accepting-transaction.service";
+import { rejectingTransactionService } from "../services/transactions/rejecting-transaction.service";
 
 export const createTransactionController = async (
    req: Request,
@@ -58,6 +59,27 @@ export const acceptingTransactionController = async (
       const authUserId = res.locals.user.id;
 
       const result = await acceptingTransactionService(
+         reciptNumber,
+         authUserId
+      );
+
+      res.status(200).send(result);
+   } catch (error) {
+      next(error);
+   }
+};
+
+
+export const rejectingTransactionController = async (
+   req: Request,
+   res: Response,
+   next: NextFunction
+) => {
+   try {
+      const { reciptNumber } = req.params;
+      const authUserId = res.locals.user.id;
+
+      const result = await rejectingTransactionService(
          reciptNumber,
          authUserId
       );

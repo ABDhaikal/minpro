@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
    acceptingTransactionController,
    createTransactionController,
+   rejectingTransactionController,
    uploadPaymentProofController,
 } from "../controllers/transactions.controller";
 import { verifyToken } from "../lib/jwt";
@@ -32,6 +33,14 @@ router.post(
    verifyToken,
    verifyRole(["ADMIN", "SUPERADMIN"]),
    acceptingTransactionController
+);
+
+
+router.post(
+   "/rejecting/:reciptNumber",
+   verifyToken,
+   verifyRole(["ADMIN", "SUPERADMIN"]),
+   rejectingTransactionController
 );
 
 export default router;
