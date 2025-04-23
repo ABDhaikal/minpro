@@ -9,7 +9,7 @@ export const uploadPaymentProofService = async (
   imageTransactionFile: Express.Multer.File
 ) => {
   try {
-    if(!imageTransactionFile) {
+    if (!imageTransactionFile) {
       throw new ApiError("Payment proof is required", 400);
     }
     const transaction = await prisma.transaction.findUnique({
@@ -31,12 +31,23 @@ export const uploadPaymentProofService = async (
       );
     }
 
+    const { secure_url } = await cloudinaryUpload(
+      imageTransactionFile,
+      "paymentProof"
+    );
+
+    const updatedTransaction = await prisma.transaction.update({
+      where: { id: transactionId },
+      data: { paymentProof: secure_url },
+    });
+
     await userTransactionProofQueue.add("uploadPaymentproof", {
       transactionId,
       imageTransactionFile,
     });
     return {
       message: "Payment proof uploaded succesfully",
+      data: updatedTransaction,
     };
   } catch (error) {
     console.error("Error uploading payment proof", error);

@@ -4,6 +4,9 @@ import { getEventCategoryService } from "../services/events/get-event-category.s
 import { getEventService } from "../services/events/get-event.service";
 import { Category } from "@prisma/client";
 import { getEvenLocationsService } from "../services/events/get-event-location.service";
+import { createEventService } from "../services/events/create-event.service";
+// import { uploadEventImagesService } from "../services/events/upload-event-images-services";
+import { publishEventService } from "../services/events/publish-event.service";
 
 export const getEventsController = async (
   req: Request,
@@ -19,7 +22,7 @@ export const getEventsController = async (
       search: (req.query.search as string) || "",
       category: (req.query.category as string) || "",
       location: (req.query.location as string) || "",
-    };
+      expired: (req.query.expired as string) === "true",    };
 
     const result = await getEventsService(query);
     res.status(200).send(result);
@@ -48,7 +51,9 @@ export const getEventController = async (
 ) => {
   try {
     const result = await getEventService(req.params.slug as string);
-    res.status(200).send({ data: result });
+    res
+      .status(200)
+      .send({ data: result, message: "Event retrieved successfully" });
   } catch (error) {
     next(error);
   }
@@ -60,6 +65,37 @@ export const getLocationsEventController = async (
 ) => {
   try {
     const result = await getEvenLocationsService();
+    res.status(200).send({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+export const createEventController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const body = req.body;
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const picture = files.eventPict?.[0];
+    const result = await createEventService(authUserId, body, picture);
+    res.status(200).send({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const publishEventController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { eventId } = req.params;
+    const authUserId = res.locals.user.id;
+    const result = await publishEventService(authUserId, eventId);
     res.status(200).send({ data: result });
   } catch (error) {
     next(error);
