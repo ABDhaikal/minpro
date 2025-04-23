@@ -7,7 +7,7 @@ import {
    validatingRefferalCodeController,
 } from "../controllers/auth.controller";
 import { validateLogin, validateRegister } from "../validators/auth.validator";
-import { verifyToken } from "../lib/jwt";
+import { verifyToken, verifyTokenForgot } from "../lib/jwt";
 
 const router = Router();
 
@@ -16,6 +16,6 @@ router.post("/register", validateRegister, registerController);
 router.post("/login", validateLogin, loginController);
 router.post("/valid-refferal", validatingRefferalCodeController);
 router.post("/forgot-pass", forgotPasswordController);
-router.patch("/update-pass",verifyToken, updatePasswordController);
+router.patch("/update-pass",verifyToken,verifyTokenForgot, updatePasswordController);
 
 export default router;
