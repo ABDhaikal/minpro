@@ -22,7 +22,8 @@ export const getEventsController = async (
       search: (req.query.search as string) || "",
       category: (req.query.category as string) || "",
       location: (req.query.location as string) || "",
-      expired: (req.query.expired as string) === "true",    };
+      expired: (req.query.expired as string) === "true",
+    };
 
     const result = await getEventsService(query);
     res.status(200).send(result);
@@ -81,7 +82,7 @@ export const createEventController = async (
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     const picture = files.eventPict?.[0];
     const result = await createEventService(authUserId, body, picture);
-    res.status(200).send({ data: result });
+    res.status(200).send(result);
   } catch (error) {
     next(error);
   }

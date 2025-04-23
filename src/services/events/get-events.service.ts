@@ -34,7 +34,7 @@ export const getEventsService = async (queries: GetEventsService) => {
   whereClause.eventEnd = {
     gt: new Date(),
   };
-
+  whereClause.status = "PUBLISH";
   const events = await prisma.event.findMany({
     where: whereClause,
     take: take,

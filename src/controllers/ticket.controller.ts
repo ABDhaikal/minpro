@@ -65,9 +65,7 @@ export const getTicketsByEventIdController = async (
   next: NextFunction
 ) => {
   try {
-
     const eventId = req.params.eventId;
-    console.log(eventId)
     const result = await getTicketsByEventIdService(eventId);
 
     res

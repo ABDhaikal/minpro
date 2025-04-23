@@ -2,13 +2,11 @@ import { Ticket } from "@prisma/client";
 import prisma from "../../config/prisma";
 import { ApiError } from "../../utils/api-error";
 
-
 export const createTicketService = async (
   authID: string,
   EventID: string,
   data: Ticket
 ) => {
-  console.log("cekkk")
   const event = await prisma.event.findUnique({
     where: { id: EventID },
     include: {
@@ -24,9 +22,9 @@ export const createTicketService = async (
     throw new ApiError("Event not found", 404);
   }
 
-  // if (event.organizers.userId !== authID) {
-  //   throw new ApiError("Forbidden", 403);
-  // }
+  if (event.organizers.userId !== authID) {
+    throw new ApiError("Forbidden", 403);
+  }
 
   const validatingNameTicket = await prisma.ticket.findFirst({
     where: {

@@ -4,28 +4,26 @@ import { body, validationResult } from "express-validator";
 import { ApiError } from "../utils/api-error";
 
 export const validateCreateEvent = [
-  // Organizer validation
-
   body("category")
+    .notEmpty()
+    .withMessage("Category is required")
     .isIn(Object.values(Category))
     .withMessage(
       "Invalid category. Must be one of: Sports, Festivals, Concerts, Theater"
     ),
-
   body("name")
-    .isString()
     .notEmpty()
+    .withMessage("Event name is required and must be a string")
+    .isString()
     .withMessage("Event name is required and must be a string"),
-
   body("description")
-    .isString()
     .notEmpty()
-    .withMessage("Description is required and must be a string"),
-
+    .withMessage("description is required and must be a string")
+    .isString()
+    .withMessage("description is required and must be a string"),
   body("location")
     .isIn(Object.values(Location))
     .withMessage("Invalid location"),
-
   body("eventStart")
     .notEmpty()
     .withMessage("eventStart is required and must be a string")
@@ -34,11 +32,10 @@ export const validateCreateEvent = [
     .toDate(),
   body("eventEnd")
     .notEmpty()
-    .withMessage("eventStart is required and must be a string")
+    .withMessage("eventEnd is required and must be a string")
     .isISO8601()
     .withMessage("Event start mus be a valid  date format")
     .toDate(),
-
   (req: Request, _res: Response, next: NextFunction) => {
     const errors = validationResult(req);
 

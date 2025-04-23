@@ -7,9 +7,6 @@ export const updateVoucherService = async (
   voucherId: string,
   data: Omit<EventVoucher, "used">
 ) => {
-
-  console.log(authID);
-  // Cari voucher berdasarkan ID
   const voucher = await prisma.eventVoucher.findFirst({
     where: {
       id: voucherId,
@@ -49,7 +46,6 @@ export const updateVoucherService = async (
     throw new ApiError("Voucher quota exceeded", 400);
   }
 
-  // Update voucher di database
   const updatedVoucher = await prisma.eventVoucher.update({
     where: {
       id: voucherId,
@@ -61,7 +57,6 @@ export const updateVoucherService = async (
     },
   });
 
-  // Kembalikan respons sukses
   return {
     message: "Voucher updated successfully",
     data: updatedVoucher,
