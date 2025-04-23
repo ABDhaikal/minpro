@@ -23,7 +23,7 @@ export const getTransactionsService = async ({
       transactionTicket: {
         select: {
           ticketId: true,
-          amount: true,
+          quantity: true,
           price: true,
         },
       },

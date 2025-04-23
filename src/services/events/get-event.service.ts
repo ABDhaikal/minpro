@@ -4,13 +4,15 @@ import { ApiError } from "../../utils/api-error";
 
 export const getEventService = async (slug: string) => {
   const event = await prisma.event.findUnique({
-    where: { slug, deletedAt: null, 
+    where: {
+      slug,
+      deletedAt: null,
       eventEnd: {
         gt: new Date(),
-      }
+      },
     },
     include: {
-      Ticket: true,
+      tickets: true,
       organizers: {
         select: {
           id: true,

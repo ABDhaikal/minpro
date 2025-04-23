@@ -53,7 +53,8 @@ model UserPoint {
 }
 
 model Transaction {
-  id                    String            @id @default(uuid())
+  id                    String            @id @default(cuid())
+  reciptNumber          String            @unique @default(uuid())
   userId                String
   status                TransactionStatus @default(WAITING_FOR_PAYMENT)
   pointsUsed            Int
@@ -88,7 +89,7 @@ enum TransactionStatus {
 }
 
 model Notification {
-  id            String   @id @default(uuid()) // Primary Key
+  id            String   @id @default(cuid()) // Primary Key
   transactionId String   @unique
   message       String
   isRead        Boolean  @default(false) // Defaults to unread
@@ -101,10 +102,12 @@ model Notification {
 }
 
 model CuponDiscount {
-  id        String       @id @default(uuid()) // Primary Key
+  id        String       @id @default(cuid()) // Primary Key
   userId    String
   type      DiscountType
   amount    Int
+  quantity  Int       @default(1)
+  used      Int         @default(0)
   expiredAt DateTime
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
@@ -123,7 +126,7 @@ enum DiscountType {
 }
 
 model CuponTransaction {
-  id              String       @id @default(uuid()) // Primary Key
+  id              String       @id @default(cuid()) // Primary Key
   transactionId   String
   cuponDiscountId String
   type            DiscountType
@@ -152,8 +155,8 @@ model Organizer {
   deletedAt        DateTime?
 
   //relation
-  Event Event[]
-  user  User    @relation(fields: [userId], references: [id])
+  events Event[]
+  users  User    @relation(fields: [userId], references: [id])
 
   @@map("organizers")
 }
@@ -176,8 +179,9 @@ model Event {
 
   //relation
   organizers   Organizer      @relation(fields: [organizerId], references: [id])
-  EventVoucher EventVoucher[]
-  Ticket       Ticket[]
+  eventVoucher EventVoucher[]
+  tickets       Ticket[]
+  usersEvents  usersEvents[]
 
   @@map("events")
 }
@@ -294,7 +298,7 @@ model transactionTicket {
   id            String    @id @default(cuid()) //primary key
   transactionId String
   ticketId      String
-  amount        Int
+  quantity        Int 
   price         Float
   createdAt     DateTime  @default(now())
   deletedAt     DateTime?
@@ -324,14 +328,17 @@ model Cart {
 model usersEvents {
   id        String    @id @default(cuid()) //primary key
   userId    String
-  ticketId  String
-  amount    Int
+  eventId   String
+  review     String?
+  rating     Int?
+  updateAt  DateTime  @updatedAt
   createdAt DateTime  @default(now())
   deletedAt DateTime?
 
   // relation
   users           User              @relation(fields: [userId], references: [id])
   userEventTicket userEventTicket[]
+  events          Event             @relation(fields: [eventId], references: [id])
 
   @@map("users_events")
 }
@@ -340,7 +347,7 @@ model userEventTicket {
   id          String    @id @default(cuid()) //primary key
   userEventId String
   ticketId    String
-  amount      Int
+  quantity      Int
   createdAt   DateTime  @default(now())
   deletedAt   DateTime?
 
