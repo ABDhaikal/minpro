@@ -26,6 +26,10 @@ export const createVoucherService = async (
     throw new ApiError("Forbidden", 403);
   }
 
+  if (data.startDate >= data.endDate) {
+    throw new ApiError("Voucher start date must be before voucher end date");
+  }
+
   const validatingNameVoucher = await prisma.eventVoucher.findFirst({
     where: {
       eventId: EventID,
@@ -43,6 +47,8 @@ export const createVoucherService = async (
       name: data.name,
       amountDiscount: data.amountDiscount,
       quota: data.quota,
+      startDate: data.startDate,
+      endDate: data.endDate,
       used: 0,
     },
   });

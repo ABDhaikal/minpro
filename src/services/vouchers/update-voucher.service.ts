@@ -42,6 +42,10 @@ export const updateVoucherService = async (
     throw new ApiError("Voucher name already exists", 400);
   }
 
+  if (data.startDate >= data.endDate) {
+    throw new ApiError("Voucher start date must be before voucher end date");
+  }
+
   if (voucher.used > data.quota) {
     throw new ApiError("Voucher quota exceeded", 400);
   }
@@ -54,6 +58,8 @@ export const updateVoucherService = async (
       name: data.name,
       amountDiscount: data.amountDiscount,
       quota: data.quota,
+      startDate: data.startDate,
+      endDate: data.endDate
     },
   });
 

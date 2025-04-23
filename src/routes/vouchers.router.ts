@@ -7,7 +7,7 @@ import {
 } from "../controllers/vouchers.controller";
 import { verifyToken } from "../lib/jwt";
 import { verifyRole } from "../middlewares/role.middleware";
-import { validateCreateVoucher } from "../validators/voucher.validator";
+import { validateCreateVoucher, validateUpdateVoucher } from "../validators/voucher.validator";
 
 const router = Router();
 
@@ -27,7 +27,7 @@ router.post(
 router.put(
   "/:voucherId",
   verifyToken,
-  validateCreateVoucher,
+  validateUpdateVoucher,
   verifyRole(["ADMIN", "SUPERADMIN"]),
   updateVoucherController
 );

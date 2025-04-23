@@ -158,6 +158,13 @@ export const createTransactionService = async (
         throw new ApiError("voucher not provide for this transaction", 401);
       }
 
+      if (
+        validatingVoucher.startDate > new Date() ||
+        validatingVoucher.endDate < new Date()
+      ) {
+        throw new ApiError("voucher is not available in this time", 401);
+      }
+
       await tx.eventVoucher.update({
         where: {
           id: body.voucherID,
