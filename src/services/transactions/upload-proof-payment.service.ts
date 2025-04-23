@@ -47,7 +47,7 @@ export const uploadPaymentProofService = async (
   await userTransactionProofQueue.add(
     "uploadPaymentproof",
     {
-      reciptNumber,
+      reciptNumber: reciptNumber,
     },
     {
       jobId: reciptNumber,
