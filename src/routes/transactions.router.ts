@@ -1,8 +1,9 @@
 import { Router } from "express";
 import {
-  acceptingTransactionController,
-  createTransactionController,
-  uploadPaymentProofController,
+   acceptingTransactionController,
+   createTransactionController,
+   rejectingTransactionController,
+   uploadPaymentProofController,
 } from "../controllers/transactions.controller";
 import { verifyToken } from "../lib/jwt";
 import { uploader } from "../lib/multer";
@@ -15,24 +16,31 @@ const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post(
-  "/",
-  verifyToken,
-  validateCreateTransaction,
-  createTransactionController
+   "/",
+   verifyToken,
+   validateCreateTransaction,
+   createTransactionController
 );
 
 router.post(
-  "/payment-proof/:transactionId",
-  verifyToken,
-  upload.single("imageTransaction"),
-  uploadPaymentProofController
+   "/payment-proof/:transactionId",
+   verifyToken,
+   upload.single("imageTransaction"),
+   uploadPaymentProofController
 );
 
 router.post(
-  "/accepting/:reciptNumber",
-  verifyToken,
-  verifyRole(["ADMIN", "SUPERADMIN"]),
-  acceptingTransactionController
+   "/accepting/:reciptNumber",
+   verifyToken,
+   verifyRole(["ADMIN", "SUPERADMIN"]),
+   acceptingTransactionController
+);
+
+router.post(
+   "/rejecting/:reciptNumber",
+   verifyToken,
+   verifyRole(["ADMIN", "SUPERADMIN"]),
+   rejectingTransactionController
 );
 
 export default router;

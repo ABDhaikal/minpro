@@ -46,6 +46,8 @@ export const updateProfileService = async (
          await cloudinaryRemove(validatingUser.profilePict);
       }
       inputData.profilePict = secure_url;
+   } else {
+      inputData.profilePict = validatingUser.profilePict;
    }
 
    const updatedUser = await prisma.user.update({
