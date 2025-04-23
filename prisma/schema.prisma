@@ -165,9 +165,9 @@ model Event {
   id          String      @id @default(cuid()) //primary key
   organizerId String
   category    Category
-  imageId     String?
-  name        String
+  name        String      @unique
   slug        String      @unique
+  image       String      
   description String
   location    Location
   status      StatusEvent @default(DRAFT)
@@ -180,7 +180,6 @@ model Event {
   //relation
   organizers   Organizer      @relation(fields: [organizerId], references: [id])
   eventVoucher EventVoucher[]
-  images        Image[]
   tickets       Ticket[]
   usersEvents  usersEvents[]
 
@@ -239,21 +238,6 @@ enum StatusEvent {
   EXPIRED
   PUBLISH
   DRAFT
-}
-
-model Image {
-  id          String    @id @default(cuid()) //primary key
-  eventId     String
-  isThumbnail Boolean   @default(false)
-  imageUrl    String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
-
-  //relation
-  event Event @relation(fields: [eventId], references: [id])
-
-  @@map("images")
 }
 
 model Ticket {

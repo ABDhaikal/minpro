@@ -6,6 +6,7 @@ import {
    uploadPaymentProofController,
 } from "../controllers/transactions.controller";
 import { verifyToken } from "../lib/jwt";
+import { uploader } from "../lib/multer";
 import { verifyRole } from "../middlewares/role.middleware";
 import { validateCreateTransaction } from "../validators/transaction.validator";
 import multer from "multer";
