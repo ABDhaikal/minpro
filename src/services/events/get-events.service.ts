@@ -30,22 +30,16 @@ export const getEventsService = async (queries: GetEventsService) => {
     }
     whereClause.category = { equals: category as Category };
   }
+  whereClause.deletedAt = null;
+  whereClause.eventEnd = {
+    gt: new Date(),
+  };
 
   const events = await prisma.event.findMany({
     where: whereClause,
     take: take,
     skip: (page - 1) * take,
     orderBy: { [sortBy]: sortOrder },
-    include: {
-      images: {
-        where: {
-          isThumbnail: true,
-        },
-        select: {
-          imageUrl: true,
-        },
-      },
-    },
   });
 
   const count = await prisma.event.count({ where: whereClause });

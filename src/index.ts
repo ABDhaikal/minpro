@@ -6,7 +6,6 @@ import eventsRouter from "./routes/events.router";
 import cartsRouter from "./routes/carts.router";
 import profileRouter from "./routes/profile.router";
 
-
 import "./jobs";
 
 import "./jobs";
@@ -14,6 +13,8 @@ import "./jobs";
 // define your routes here
 import authRouter from "./routes/auth.router";
 import transactionsRouter from "./routes/transactions.router";
+import vouchersRouter from "./routes/vouchers.router";
+import ticketsRouter from "./routes/tickets.router";
 
 // define the express app
 const app = express();
@@ -27,9 +28,10 @@ app.use("/carts", cartsRouter);
 app.use("/auth", authRouter);
 app.use("/transactions", transactionsRouter);
 app.use("/profile", profileRouter);
+app.use("/vouchers", vouchersRouter);
+app.use("/tickets", ticketsRouter);
 
 // app.use("/examples", exampleRouter);
-app.use("/events", eventsRouter); // example route
 
 // your error middle ware
 app.use(errorMiddleware);
