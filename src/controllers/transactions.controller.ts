@@ -69,7 +69,6 @@ export const acceptingTransactionController = async (
    }
 };
 
-
 export const rejectingTransactionController = async (
    req: Request,
    res: Response,

@@ -35,7 +35,6 @@ router.post(
    acceptingTransactionController
 );
 
-
 router.post(
    "/rejecting/:reciptNumber",
    verifyToken,
