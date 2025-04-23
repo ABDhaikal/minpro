@@ -5,7 +5,7 @@ import { join } from "path";
 import {
    APP_URL,
    FORGOT_PASSWORD_EXPIRATION,
-   JWT_SECRET,
+   JWT_SECRET_RESET_PASS_KEY
 } from "../../config/env";
 import prisma from "../../config/prisma";
 import { transporter } from "../../lib/nodemailer";
@@ -29,7 +29,7 @@ export const ForgotPasswordService = async (email: string) => {
    const tokenPayload = {
       tokenForget: existingUser.id,
    };
-   const token = sign(tokenPayload, JWT_SECRET as string, {
+   const token = sign(tokenPayload, JWT_SECRET_RESET_PASS_KEY as string, {
       jwtid: existingUser.id,
       expiresIn: FORGOT_PASSWORD_EXPIRATION,
    });
