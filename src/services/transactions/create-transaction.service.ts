@@ -92,6 +92,7 @@ export const createTransactionService = async (
                   events: {
                      select: {
                         id: true,
+                        status: true,
                      },
                   },
                },
@@ -109,6 +110,9 @@ export const createTransactionService = async (
                throw new ApiError(
                   "system not provide buying ticket with different event"
                );
+            }
+            if (data.events.status !== "PUBLISH") {
+               throw new ApiError("event not avilable to buy", 403);
             }
 
             await tx.ticket.update({

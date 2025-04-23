@@ -1,22 +1,19 @@
 import { Router } from "express";
-import multer from "multer";
 import {
   createEventController,
   getCategoryController,
   getEventController,
   getEventsController,
   getLocationsEventController,
-  publishEventController
+  publishEventController,
 } from "../controllers/events.controller";
-import { fileFilter } from "../lib/fileFilter";
-import { verifyToken } from "../lib/jwt";
-import { uploader } from "../lib/multer";
 import { verifyRole } from "../middlewares/role.middleware";
+import { verifyToken } from "../lib/jwt";
 import { validateCreateEvent } from "../validators/event.validator";
+import { uploader } from "../lib/multer";
+import { fileFilter } from "../lib/fileFilter";
 
 const router = Router();
-
-const upload = multer({ storage: multer.memoryStorage() });
 
 router.get("/", getEventsController);
 router.get("/categories", getCategoryController);
@@ -25,24 +22,19 @@ router.get("/:slug", getEventController);
 
 router.post(
   "/",
-  fileFilter(["image/png", "image/jpeg", "image/avif"]),
   uploader().fields([{ name: "eventPict", maxCount: 1 }]),
+  fileFilter(["image/png", "image/jpeg", "image/avif"]),
   validateCreateEvent,
   verifyToken,
-  verifyRole(["ADMIN","SUPERADMIN"]),
+  verifyRole(["ADMIN", "SUPERADMIN"]),
   createEventController
 );
 
-// router.post(
-//   "/upload-event-images/:eventId",
-//   uploader().fields([{ name: "eventImages", maxCount: 5 }]),
-//   fileFilter(["image/png", "image/jpeg", "image/avif"]),
-//   validateUploadImages,
-//   uploadEventImagesController
-// );
-router.post("/publish/:eventId",
+router.post(
+  "/publish/:eventId",
   verifyToken,
-  verifyRole(["ADMIN","SUPERADMIN"]),
-  publishEventController);
+  verifyRole(["ADMIN", "SUPERADMIN"]),
+  publishEventController
+);
 
 export default router;

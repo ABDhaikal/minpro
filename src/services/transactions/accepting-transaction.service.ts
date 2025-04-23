@@ -78,10 +78,9 @@ export const acceptingTransactionService = async (
    });
 
    const filteredTicket = transaction_ticket.filter((obj, idx, self) => {
-      self.findIndex((o) => o.tickets.id === obj.tickets.id);
+      idx ===self.findIndex((o) => o.tickets.id === obj.tickets.id);
    });
 
-   console.log("filteredTicket", filteredTicket);
 
    if (filteredTicket.length > 0) {
       throw new ApiError("Duplicate ticket found", 400);
@@ -99,7 +98,6 @@ export const acceptingTransactionService = async (
             idx === self.findIndex((o) => o.eventId === obj.eventId)
       );
 
-      console.log("event_to_buy_unique", event_to_buy_unique);
 
       await Promise.all(
          event_to_buy_unique.map(async (event_to_buy) => {
