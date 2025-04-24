@@ -24,9 +24,9 @@ model User {
   transaction   Transaction[]
   cuponDiscount CuponDiscount[]
   Cart          Cart[]
-  Organizer     Organizer?
+  organizer     Organizer?
   usersEvents   usersEvents[]
-  UserPoint     UserPoint?
+  userPoints    UserPoint?
 
   @@map("users")
 }

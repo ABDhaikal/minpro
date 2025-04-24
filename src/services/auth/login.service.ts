@@ -5,45 +5,36 @@ import prisma from "../../config/prisma";
 import { verifyPassword } from "../../lib/argon";
 import { ApiError } from "../../utils/api-error";
 
-interface ILoginService {
-   userData: Pick<User, "email" | "password">;
-}
-
-export const LoginService = async (body: ILoginService) => {
+export const LoginService = async (body: Pick<User, "email" | "password">) => {
    const existingUser = await prisma.user.findUnique({
-      where: { email: body.userData.email },
+      where: { email: body.email },
    });
    if (!existingUser || existingUser.deletedAt) {
       throw new ApiError("Email is not registered", 404);
    }
 
-   if (existingUser.deletedAt) {
-      throw new ApiError("User is not registered", 404);
-   }
-
-   // Check if the password is correct
    const isPasswordValid = await verifyPassword(
-      body.userData.password,
-      existingUser.password
+      body.password as string,
+      existingUser.password as string
    );
    if (!isPasswordValid) {
       throw new ApiError("Invalid password", 401);
    }
 
-   //    generate token
-
    const tokenPayload = {
       id: existingUser.id,
-      email: existingUser.email,
+      email: existingUser.email as string,
       role: existingUser.role,
    };
    const token = sign(tokenPayload, JWT_SECRET as string, {
       expiresIn: LOGIN_EXPIRATION,
    });
 
-   const { password, ...userWithoutPassword } = existingUser;
+   const message = `Welcome back ${existingUser.username}`;
+   const { password, ...user } = existingUser;
    return {
-      userWithoutPassword,
+      message,
+      user,
       token,
    };
 };

@@ -5,7 +5,7 @@ import { join } from "path";
 import {
    APP_URL,
    FORGOT_PASSWORD_EXPIRATION,
-   JWT_SECRET_RESET_PASS_KEY
+   JWT_SECRET_RESET_PASS_KEY,
 } from "../../config/env";
 import prisma from "../../config/prisma";
 import { transporter } from "../../lib/nodemailer";
@@ -18,7 +18,7 @@ export const ForgotPasswordService = async (email: string) => {
    if (typeof email !== "string") {
       throw new ApiError("Email must be a string", 400);
    }
-
+   email = email.trim().toLowerCase();
    const existingUser = await prisma.user.findUnique({
       where: { email: email },
    });
@@ -38,7 +38,7 @@ export const ForgotPasswordService = async (email: string) => {
    const templatePath = join(__dirname, "../../templates/reset-pass.hbs");
    const templateSource = (await fs.readFile(templatePath)).toString();
    const compiledTemplate = Handlebars.compile(templateSource);
-   const link = `${APP_URL}/auth/reset-password/${token}`;
+   const link = `${APP_URL}/reset-password/${token}`;
    const html = compiledTemplate({
       userName: existingUser.username,
       resetLink: link,
@@ -49,5 +49,5 @@ export const ForgotPasswordService = async (email: string) => {
       subject: "reset password",
       html: html,
    });
-   return " Password reset link sent to your email";
+   return { message: " Password reset link sent to your email" };
 };
