@@ -6,6 +6,7 @@ import { ApiError } from "../utils/api-error";
 import { getTransactionsService } from "../services/transactions/get-transactions.service";
 import { acceptingTransactionService } from "../services/transactions/accepting-transaction.service";
 import { rejectingTransactionService } from "../services/transactions/rejecting-transaction.service";
+import { Result } from "express-validator";
 
 export const getTransactionController = async (
   req: Request,
@@ -28,84 +29,79 @@ export const getTransactionController = async (
 };
 
 export const createTransactionController = async (
-   req: Request,
-   res: Response,
-   next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-   try {
-      const result = await createTransactionService(
-         req.body,
-         String(res.locals.user.id)
-      );
-      res.status(200).send(result);
-   } catch (error) {
-      next(error);
-   }
+  try {
+    const result = await createTransactionService(
+      req.body,
+      String(res.locals.user.id)
+    );
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const uploadPaymentProofController = async (
-   req: Request,
-   res: Response,
-   next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-   try {
-      const file = req.file as Express.Multer.File;
+  try {
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const picture = files.proofImage?.[0];
 
-      if (!file) {
-         throw new ApiError("No file uploaded", 400);
-      }
+    if (!picture) {
+      throw new ApiError("No file uploaded", 400);
+    }
 
-      const { transactionId } = req.params;
-      const authUserId = res.locals.user.id;
+    const { reciptNumber } = req.params;
+    const authUserId = res.locals.user.id;
 
-      const result = await uploadPaymentProofService(
-         transactionId,
-         authUserId,
-         file
-      );
+    const result = await uploadPaymentProofService(
+      reciptNumber,
+      authUserId,
+      picture
+    );
 
-      res.status(201).send(result);
-   } catch (error: any) {
-      next(error);
-   }
+    res.status(201).send(result);
+  } catch (error: any) {
+    next(error);
+  }
 };
 
 export const acceptingTransactionController = async (
-   req: Request,
-   res: Response,
-   next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-   try {
-      const { reciptNumber } = req.params;
-      const authUserId = res.locals.user.id;
+  try {
+    const { reciptNumber } = req.params;
+    const authUserId = res.locals.user.id;
 
-      const result = await acceptingTransactionService(
-         reciptNumber,
-         authUserId
-      );
+    const result = await acceptingTransactionService(reciptNumber, authUserId);
 
-      res.status(200).send(result);
-   } catch (error) {
-      next(error);
-   }
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const rejectingTransactionController = async (
-   req: Request,
-   res: Response,
-   next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-   try {
-      const { reciptNumber } = req.params;
-      const authUserId = res.locals.user.id;
+  try {
+    const { reciptNumber } = req.params;
+    const authUserId = res.locals.user.id;
 
-      const result = await rejectingTransactionService(
-         reciptNumber,
-         authUserId
-      );
+    const result = await rejectingTransactionService(reciptNumber, authUserId);
 
-      res.status(200).send(result);
-   } catch (error) {
-      next(error);
-   }
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
 };

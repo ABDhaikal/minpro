@@ -1,17 +1,15 @@
-import { Category, Event, Location, StatusEvent } from "@prisma/client";
-import prisma from "../../config/prisma";
-import { ApiError } from "../../utils/api-error";
+import { Event } from "@prisma/client";
 import slugify from "slugify";
-import { body } from "express-validator";
+import prisma from "../../config/prisma";
 import { cloudinaryRemove, cloudinaryUpload } from "../../lib/cloudinary";
-import e from "express";
+import { ApiError } from "../../utils/api-error";
 
 export const createEventService = async (
   authID: string,
   data: Omit<Event, "slug" | "createdAt" | "deletedAt" | "updatedAt">,
   eventPict: Express.Multer.File | undefined
 ) => {
-  // verivikasi organizer
+  
   const organizer = await prisma.organizer.findUnique({
     where: { userId: authID },
   });
@@ -32,7 +30,7 @@ export const createEventService = async (
     throw new ApiError("Event name already exists");
   }
 
-  // generate slug
+  
   const slug = slugify(data.name, {
     replacement: "_",
     lower: true,
@@ -125,6 +123,6 @@ export const createEventService = async (
 
   return {
     message: "Event created successfully",
-    // data: data,
+    data: data,
   };
 };

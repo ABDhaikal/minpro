@@ -7,6 +7,7 @@ export const getEventService = async (slug: string) => {
     where: {
       slug,
       deletedAt: null,
+      status: "PUBLISH",
       eventEnd: {
         gt: new Date(),
       },
