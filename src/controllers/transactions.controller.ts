@@ -7,6 +7,7 @@ import { getTransactionsService } from "../services/transactions/get-transaction
 import { acceptingTransactionService } from "../services/transactions/accepting-transaction.service";
 import { rejectingTransactionService } from "../services/transactions/rejecting-transaction.service";
 import { Result } from "express-validator";
+import { log } from "console";
 
 export const getTransactionController = async (
   req: Request,
