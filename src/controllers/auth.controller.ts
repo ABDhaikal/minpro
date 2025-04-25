@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import e, { NextFunction, Request, Response } from "express";
 import { LoginService } from "../services/auth/login.service";
 import { registerService } from "../services/auth/register.service";
 import { validatingRefferalCodeService } from "../services/auth/validating-refferal-code.service";
@@ -6,6 +6,7 @@ import { ApiError } from "../utils/api-error";
 import { updatePasswordService } from "../services/auth/update-password.service";
 import { resetPasswordService } from "../services/auth/reset-password.service";
 import { ForgotPasswordService } from "../services/auth/forgot-password.service";
+import { registerOrganizerService } from "../services/auth/register-organizer.service";
 
 export const registerController = async (
    req: Request,
@@ -15,6 +16,26 @@ export const registerController = async (
    try {
       const user = await registerService(req.body);
       res.status(200).json(user);
+   } catch (error) {
+      return next(error);
+   }
+};
+
+export const registerOrganizerController = async (
+   req: Request,
+   res: Response,
+   next: NextFunction
+) => {
+   try {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const picture = files.organizerPict?.[0];
+      const authUserId = res.locals.user.id;
+      const result = await registerOrganizerService(
+         authUserId,
+         picture,
+         req.body
+      );
+      res.status(200).json(result);
    } catch (error) {
       return next(error);
    }
@@ -42,8 +63,8 @@ export const loginController = async (
    next: NextFunction
 ) => {
    try {
-      const user = await LoginService(req.body);
-      res.status(200).json(user);
+      const result = await LoginService(req.body);
+      res.status(200).json(result);
    } catch (error) {
       next(error);
    }
