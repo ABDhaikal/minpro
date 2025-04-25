@@ -28,7 +28,7 @@ export const FORGOT_PASSWORD_EXPIRATION = "2h";
 export const EXPIRED_PAYMENT_DEADLINE_HOUR = 2;
 export const EXPIRED_ADMIN_CONFIRM_DEADLINE_DAY = 3;
 
-export const APP_URL = "https://www.google.com";
+export const APP_URL = "http://localhost:3000/";
 export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;

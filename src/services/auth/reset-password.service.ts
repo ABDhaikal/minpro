@@ -6,7 +6,6 @@ export const resetPasswordService = async (
    userId: string,
    newPassword: string
 ) => {
-   // validate userId and password
    if (!newPassword) {
       throw new ApiError("New password is required", 400);
    }
@@ -26,7 +25,6 @@ export const resetPasswordService = async (
 
    const hashedPassword = await hashPassword(newPassword);
 
-   // update user data
    const updatePassword = await prisma.user.update({
       where: {
          id: userId,
@@ -43,6 +41,5 @@ export const resetPasswordService = async (
       throw new ApiError("Failed to update password", 500);
    }
 
-   
-   return "Password updated successfully";
+   return { message: "Password updated successfully" };
 };
