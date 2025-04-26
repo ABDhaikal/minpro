@@ -15,6 +15,7 @@ import authRouter from "./routes/auth.router";
 import transactionsRouter from "./routes/transactions.router";
 import vouchersRouter from "./routes/vouchers.router";
 import ticketsRouter from "./routes/tickets.router";
+import reviewsRouter from "./routes/reviews.router";
 
 // define the express app
 const app = express();
@@ -30,6 +31,7 @@ app.use("/transactions", transactionsRouter);
 app.use("/profile", profileRouter);
 app.use("/vouchers", vouchersRouter);
 app.use("/tickets", ticketsRouter);
+app.use("/reviews", reviewsRouter);
 
 // app.use("/examples", exampleRouter);
 
