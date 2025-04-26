@@ -23,7 +23,7 @@ export const updateCartService = async (body: ICartService, userId: string) => {
   const available = cart.tickets.amount - cart.tickets.buyed;
 
   if (body.amount <= 0) {
-    throw new ApiError("amount should more than 0", 401);
+    throw new ApiError("amount should more than 0", 400);
   }
 
   if (body.amount > available) {

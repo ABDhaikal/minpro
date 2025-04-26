@@ -42,7 +42,7 @@ export const createTransactionService = async (
       });
 
       if (!userPoint || userPoint.amount < body.pointsUsed) {
-        throw new ApiError("User doesnt have enough point", 401);
+        throw new ApiError("User doesnt have enough point", 400);
       }
     } else {
       body.pointsUsed = 0;
@@ -155,14 +155,14 @@ export const createTransactionService = async (
       }
 
       if (validatingVoucher.eventId !== eventid) {
-        throw new ApiError("voucher not provide for this transaction", 401);
+        throw new ApiError("voucher not provide for this transaction", 400);
       }
 
       if (
         validatingVoucher.startDate > new Date() ||
         validatingVoucher.endDate < new Date()
       ) {
-        throw new ApiError("voucher is not available in this time", 401);
+        throw new ApiError("voucher is not available in this time", 400);
       }
 
       await tx.eventVoucher.update({
