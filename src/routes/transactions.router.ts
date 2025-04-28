@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   acceptingTransactionController,
   createTransactionController,
+  getUserPointController,
   rejectingTransactionController,
   uploadPaymentProofController,
 } from "../controllers/transactions.controller";
@@ -41,5 +42,7 @@ router.post(
   verifyRole(["ADMIN", "SUPERADMIN"]),
   rejectingTransactionController
 );
+
+router.get("/point", verifyToken, getUserPointController);
 
 export default router;

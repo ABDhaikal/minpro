@@ -8,6 +8,7 @@ import { acceptingTransactionService } from "../services/transactions/accepting-
 import { rejectingTransactionService } from "../services/transactions/rejecting-transaction.service";
 import { Result } from "express-validator";
 import { log } from "console";
+import { getUserPointService } from "../services/transactions/get-user-point.service";
 
 export const getTransactionController = async (
   req: Request,
@@ -100,6 +101,22 @@ export const rejectingTransactionController = async (
     const authUserId = res.locals.user.id;
 
     const result = await rejectingTransactionService(reciptNumber, authUserId);
+
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserPointController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+
+    const result = await getUserPointService(authUserId);
 
     res.status(200).send(result);
   } catch (error) {

@@ -7,6 +7,7 @@ import { updatePasswordService } from "../services/auth/update-password.service"
 import { resetPasswordService } from "../services/auth/reset-password.service";
 import { ForgotPasswordService } from "../services/auth/forgot-password.service";
 import { registerOrganizerService } from "../services/auth/register-organizer.service";
+import { validatingNewOrganizerNameService } from "../services/auth/validating-new-organizer-name.service";
 
 export const registerController = async (
    req: Request,
@@ -116,3 +117,22 @@ export const forgotPasswordController = async (
       return next(error);
    }
 };
+
+
+export const validatingNewOrganizerNameController = async (
+   req: Request,
+   res: Response,
+   next: NextFunction
+) => {
+   try {
+      const name = req.body.name;
+      const authUserId = res.locals.user.id;
+      const existingName = await validatingNewOrganizerNameService(
+         authUserId,
+         name
+      );
+      res.status(200).json(existingName);
+   } catch (error) {
+      return next(error);
+   }
+}
