@@ -1,16 +1,18 @@
 import { Router } from "express";
 import {
-   forgotPasswordController,
-   loginController,
-   registerController,
-   registerOrganizerController,
-   updatePasswordController,
-   validatingRefferalCodeController,
+  forgotPasswordController,
+  loginController,
+  registerController,
+  registerOrganizerController,
+  updatePasswordController,
+  validatingNewOrganizerNameController,
+  validatingRefferalCodeController,
 } from "../controllers/auth.controller";
 import {
-   validateLogin,
-   validateRegister,
-   validateRegisterOrganizer,
+  validateLogin,
+  validateNewNameOrganizer,
+  validateRegister,
+  validateRegisterOrganizer,
 } from "../validators/auth.validator";
 import { verifyToken, verifyTokenForgot } from "../lib/jwt";
 import { uploader } from "../lib/multer";
@@ -22,22 +24,28 @@ const router = Router();
 // Define the all routes for the user router
 router.post("/register", validateRegister, registerController);
 router.post(
-   "/register-organizer",
-   verifyToken,
-   verifyRole(["USER"]),
-   uploader().fields([{ name: "organizerPict", maxCount: 1 }]),
-   fileFilter(["image/png", "image/jpeg", "image/avif"]),
-   validateRegisterOrganizer,
-   registerOrganizerController
+  "/validate-new-organizer-name",
+  verifyToken,
+  validateNewNameOrganizer,
+  validatingNewOrganizerNameController
+);
+router.post(
+  "/register-organizer",
+  verifyToken,
+  verifyRole(["USER"]),
+  uploader().fields([{ name: "organizerPict", maxCount: 1 }]),
+  fileFilter(["image/png", "image/jpeg", "image/avif"]),
+  validateRegisterOrganizer,
+  registerOrganizerController
 );
 router.post("/login", validateLogin, loginController);
 router.post("/valid-refferal", validatingRefferalCodeController);
 router.post("/forgot-pass", forgotPasswordController);
 router.patch(
-   "/update-pass",
-   verifyToken,
-   verifyTokenForgot,
-   updatePasswordController
+  "/update-pass",
+  verifyToken,
+  verifyTokenForgot,
+  updatePasswordController
 );
 
 export default router;
