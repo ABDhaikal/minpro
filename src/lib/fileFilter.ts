@@ -10,7 +10,7 @@ export const fileFilter = (allowedTypes: core.MimeType[]) => {
       for (const fieldname in files) {
          const fileArray = files[fieldname];
 
-         for (const file of fileArray) {
+         for (const file of fileArray) { 
             const type = await fromBuffer(file.buffer);
 
             if (!type || !allowedTypes.includes(type.mime)) {

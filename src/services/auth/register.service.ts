@@ -129,6 +129,6 @@ export const registerService = async (
    return {
       user : result.user,
       message: `Welcome ${body.username}, to our service`,
-      token: result.token,
+      accessToken: result.token,
    };
 };

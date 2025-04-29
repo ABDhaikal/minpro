@@ -33,8 +33,8 @@ router.post(
   "/register-organizer",
   verifyToken,
   verifyRole(["USER"]),
-  uploader().fields([{ name: "organizerPict", maxCount: 1 }]),
-  fileFilter(["image/png", "image/jpeg", "image/avif"]),
+  uploader().fields([{ name: "organizerPict", maxCount: 1 }]), //mecah mana yang file mana yang bukan
+  fileFilter(["image/png", "image/jpeg", "image/avif"]), // filter file
   validateRegisterOrganizer,
   registerOrganizerController
 );
