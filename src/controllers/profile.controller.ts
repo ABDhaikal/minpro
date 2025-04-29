@@ -65,3 +65,19 @@ export const updateOrganizerController = async (
     return next(error);
   }
 };
+
+
+
+export const updateUsernameController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const user = await updateUsernameService(authUserId, req.body);
+    res.status(200).json(user);
+  } catch (error) {
+    return next(error);
+  }
+}

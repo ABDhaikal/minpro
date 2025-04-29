@@ -1,8 +1,9 @@
 import { Router } from "express";
 import {
-   updateOrganizerController,
-   UpdateProfileController,
-   updateProfilePictController,
+  updateOrganizerController,
+  UpdateProfileController,
+  updateProfilePictController,
+  updateUsernameController,
 } from "../controllers/profile.controller";
 import { verifyToken } from "../lib/jwt";
 import { verifyRole } from "../middlewares/role.middleware";
@@ -15,27 +16,30 @@ const router = Router();
 // Define the all routes for the user router
 
 router.patch(
-   "/",
-   verifyToken,
-   uploader().fields([{ name: "profilePict", maxCount: 1 }]),
-   fileFilter(["image/png", "image/jpeg", "image/avif"]),
-   validateUpdateUserProfile,
-   UpdateProfileController
+  "/",
+  verifyToken,
+  uploader().fields([{ name: "profilePict", maxCount: 1 }]),
+  fileFilter(["image/png", "image/jpeg", "image/avif"]),
+  validateUpdateUserProfile,
+  UpdateProfileController
+);
+
+router.patch("/username", verifyToken, updateUsernameController);
+
+router.patch(
+  "/profile-pict",
+  verifyToken,
+  uploader().fields([{ name: "profilePict", maxCount: 1 }]),
+  fileFilter(["image/png", "image/jpeg", "image/avif"]),
+  updateProfilePictController
 );
 router.patch(
-   "/profile-pict",
-   verifyToken,
-   uploader().fields([{ name: "profilePict", maxCount: 1 }]),
-   fileFilter(["image/png", "image/jpeg", "image/avif"]),
-   updateProfilePictController
-);
-router.patch(
-   "/organizer",
-   verifyToken,
-   verifyRole(["ADMIN"]),
-   uploader().fields([{ name: "picture", maxCount: 1 }]),
-   fileFilter(["image/png", "image/jpeg", "image/avif"]),
-   updateOrganizerController
+  "/organizer",
+  verifyToken,
+  verifyRole(["ADMIN"]),
+  uploader().fields([{ name: "picture", maxCount: 1 }]),
+  fileFilter(["image/png", "image/jpeg", "image/avif"]),
+  updateOrganizerController
 );
 
 export default router;

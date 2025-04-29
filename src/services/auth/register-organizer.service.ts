@@ -25,7 +25,7 @@ export const registerOrganizerService = async (
   }
 
   if (picture) {
-    const { secure_url } = await cloudinaryUpload(picture, `organizer `);
+    const { secure_url } = await cloudinaryUpload(picture, `organizer`);
     body.organizerPicture = secure_url;
   }
 
@@ -54,8 +54,8 @@ export const registerOrganizerService = async (
         },
       },
     },
-    include: {
-      organizer: true,
+    omit: {
+      password: true,
     },
   });
   if (!newUser) {
@@ -70,7 +70,8 @@ export const registerOrganizerService = async (
   });
 
   return {
-    message: `now you are an organizer of ${newUser.organizer!.name}`,
-    token: token,
+    message: `now you are an organizer of ${body.name}`,
+    accessToken: token,
+    user: newUser,
   };
 };
