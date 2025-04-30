@@ -3,6 +3,8 @@ import { updateOrganizerService } from "../services/profiles/update-organizer.se
 import { updateProfilePictService } from "../services/profiles/update-profile-Pic.service";
 import { updateProfileService } from "../services/profiles/update-profile.service";
 import { updateUsernameService } from "../services/profiles/update-username.service";
+import { updateEmailService } from "../services/profiles/update-email.service";
+import { validatingEmailService } from "../services/profiles/validating-email.service";
 
 export const UpdateProfileController = async (
   req: Request,
@@ -66,16 +68,28 @@ export const updateOrganizerController = async (
   }
 };
 
-
-
-export const updateUsernameController = async (
+export const updateEmailController = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const authUserId = res.locals.user.id;
-    const user = await updateUsernameService(authUserId, req.body);
+    const user = await updateEmailService(authUserId, req.body);
+    res.status(200).json(user);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const validatingEmailController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const user = await validatingEmailService(authUserId, req.body);
     res.status(200).json(user);
   } catch (error) {
     return next(error);

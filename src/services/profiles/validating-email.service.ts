@@ -1,11 +1,8 @@
 import { User } from "@prisma/client";
 import prisma from "../../config/prisma";
 import { ApiError } from "../../utils/api-error";
-import { sign } from "jsonwebtoken";
-import { JWT_SECRET, LOGIN_EXPIRATION } from "../../config/env";
-import { access } from "fs";
 
-export const updateEmailService = async (
+export const validatingEmailService = async (
   senderId: string,
   inputData: Pick<User, "email">
 ) => {
@@ -36,29 +33,7 @@ export const updateEmailService = async (
     throw new ApiError("Email already exists", 409);
   }
 
-  const updatedUser = await prisma.user.update({
-    where: {
-      id: senderId,
-    },
-    data: {
-      email: inputData.email,
-    },
-    omit: {
-      password: true,
-    },
-  });
-
-  const tokenPayload = {
-    id: updatedUser.id,
-    role: updatedUser.role,
-  };
-  const token = sign(tokenPayload, JWT_SECRET as string, {
-    expiresIn: LOGIN_EXPIRATION,
-  });
-
   return {
-    user: updatedUser,
-    accessToken: token,
-    message: "Email updated successfully",
+    message: "Email ready to use",
   };
 };

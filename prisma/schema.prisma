@@ -149,7 +149,7 @@ model Organizer {
   organizerPicture String?
   description      String
   bankTarget       String
-  paymentTarget    Int
+  paymentTarget    String    
   updatedAt        DateTime  @updatedAt
   createdAt        DateTime  @default(now())
   deletedAt        DateTime?
