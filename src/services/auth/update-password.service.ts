@@ -32,7 +32,7 @@ export const updatePasswordService = async (
       existingUser.password
    );
    if (!isPasswordValid) {
-      throw new ApiError("Invalid password", 401);
+      throw new ApiError("Invalid password", 400);
    }
    const hashedPassword = await hashPassword(newPassword);
 

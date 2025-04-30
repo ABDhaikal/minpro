@@ -84,8 +84,9 @@ export const validateRegisterOrganizer = [
     .withMessage("Description is required")
     .isString()
     .withMessage("Description must be a string")
-    .isLength({ min: 3, max: 500 })
-    .withMessage("Description must be between 3 and 500 characters long"),
+    .trim()
+    .isLength({ min: 3 })
+    .withMessage("Description must be at least 3 characters long"),
   body("bankTarget")
     .notEmpty()
     .withMessage("Bank Name is required")
@@ -97,16 +98,15 @@ export const validateRegisterOrganizer = [
     .toUpperCase(),
   body("paymentTarget")
     .notEmpty()
-    .withMessage("Payment target is required")
-    .toInt()
-    .isNumeric()
-    .withMessage("Payment target is required and must be a number"),
+    .isString()
+    .withMessage("Payment target must be a string")
+    .matches(/^\d+$/)
+    .withMessage("Payment target must be a number"),
   (req: Request, res: Response, next: NextFunction) => {
     const err = validationResult(req);
     if (!err.isEmpty()) {
       throw new ApiError(err.array()[0].msg, 400);
     }
-
     next();
   },
 ];
@@ -122,6 +122,32 @@ export const validateNewNameOrganizer = [
     .withMessage("Name must not contain special characters")
     .isLength({ min: 3, max: 20 })
     .withMessage("Name must be between 3 and 20 characters long"),
+  (req: Request, res: Response, next: NextFunction) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+      throw new ApiError(err.array()[0].msg, 400);
+    }
+
+    next();
+  },
+];
+
+export const validateUpdatePassword = [
+  body("newPassword")
+    .notEmpty()
+    .withMessage("Password is required")
+    .isString()
+    .withMessage("Password must be a string")
+    .isStrongPassword({
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 0,
+    })
+    .withMessage(
+      "Password must be at least 8 characters long, contain at least one lowercase letter, one uppercase letter, and one number"
+    ),
   (req: Request, res: Response, next: NextFunction) => {
     const err = validationResult(req);
     if (!err.isEmpty()) {

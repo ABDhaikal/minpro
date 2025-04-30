@@ -13,6 +13,7 @@ import {
   validateNewNameOrganizer,
   validateRegister,
   validateRegisterOrganizer,
+  validateUpdatePassword,
 } from "../validators/auth.validator";
 import { verifyToken, verifyTokenForgot } from "../lib/jwt";
 import { uploader } from "../lib/multer";
@@ -45,6 +46,7 @@ router.patch(
   "/update-pass",
   verifyToken,
   verifyTokenForgot,
+  validateUpdatePassword,
   updatePasswordController
 );
 

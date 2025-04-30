@@ -1,13 +1,19 @@
 import { Router } from "express";
 import {
+  updateEmailController,
   updateOrganizerController,
   UpdateProfileController,
   updateProfilePictController,
-  updateUsernameController,
+  UpdateUsernameController,
+  validatingEmailController,
 } from "../controllers/profile.controller";
 import { verifyToken } from "../lib/jwt";
 import { verifyRole } from "../middlewares/role.middleware";
-import { validateUpdateUserProfile } from "../validators/porfile.validators";
+import {
+  validateUpdateEmail,
+  validateUpdateName,
+  validateUpdateUserProfile,
+} from "../validators/porfile.validators";
 import { uploader } from "../lib/multer";
 import { fileFilter } from "../lib/fileFilter";
 
@@ -24,7 +30,13 @@ router.patch(
   UpdateProfileController
 );
 
-router.patch("/username", verifyToken, updateUsernameController);
+router.patch(
+  "/username",
+  verifyToken,
+  validateUpdateName,
+  UpdateUsernameController
+);
+router.patch("/email", verifyToken, validateUpdateEmail, updateEmailController);
 
 router.patch(
   "/profile-pict",
@@ -40,6 +52,12 @@ router.patch(
   uploader().fields([{ name: "picture", maxCount: 1 }]),
   fileFilter(["image/png", "image/jpeg", "image/avif"]),
   updateOrganizerController
+);
+router.post(
+  "/validate-email",
+  verifyToken,
+  validateUpdateEmail,
+  validatingEmailController
 );
 
 export default router;
