@@ -42,12 +42,12 @@ export const getTransactionsService = async ({
     },
   });
 
-  if (!transactions || transactions.length === 0) {
+  if (!transactions ) {
     throw new ApiError("No transactions found for this user", 404);
   }
 
   return {
-    transactions,
+    data: transactions,
     message: "Transactions fetched successfully",
   };
 };

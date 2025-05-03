@@ -7,6 +7,10 @@ import { getEvenLocationsService } from "../services/events/get-event-location.s
 import { createEventService } from "../services/events/create-event.service";
 // import { uploadEventImagesService } from "../services/events/upload-event-images-services";
 import { publishEventService } from "../services/events/publish-event.service";
+import { getOrganizerEventsService } from "../services/events/get-organizer-event.service";
+import { getOrgDetailEventService } from "../services/events/get-org-detail-event.service";
+import { getEventOrgLocService } from "../services/events/get-org-event-location.service";
+import { getEventAtendeeService } from "../services/events/get-event-atandee.service";
 
 export const getEventsController = async (
   req: Request,
@@ -98,6 +102,82 @@ export const publishEventController = async (
     const authUserId = res.locals.user.id;
     const result = await publishEventService(authUserId, eventId);
     res.status(200).send({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrganizerEventsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const query = {
+      page: parseInt(req.query.page as string) || 1,
+      take: parseInt(req.query.take as string) || 4,
+      sortOrder: (req.query.sortOrder as string) || "desc",
+      sortBy: (req.query.sortBy as string) || "createdAt",
+      search: (req.query.search as string) || "",
+      category: (req.query.category as string) || null,
+      location: (req.query.location as string) || "",
+      date: (req.query.date as string) || null,
+    };
+    const result = await getOrganizerEventsService(authUserId, query);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrgDetailEventController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const { id } = req.params;
+    const result = await getOrgDetailEventService(authUserId, id);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEventOrgLocController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const result = await getEventOrgLocService(authUserId);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEventAtendeeController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const { eventId } = req.params;
+    const query = {
+      page: parseInt(req.query.page as string) || 1,
+      take: parseInt(req.query.take as string) || 4,
+      sortOrder: (req.query.sortOrder as string) || "desc",
+      sortBy: (req.query.sortBy as string) || "updatedAt",
+      search: (req.query.search as string) || "",
+      ticket: (req.query.ticket as string) || "",
+    };
+    const result = await getEventAtendeeService(authUserId, eventId, query);
+    res.status(200).send(result);
   } catch (error) {
     next(error);
   }

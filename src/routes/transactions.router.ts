@@ -2,6 +2,8 @@ import { Router } from "express";
 import {
   acceptingTransactionController,
   createTransactionController,
+  getEventTransactionController,
+  getEventTransChartController,
   getUserPointController,
   rejectingTransactionController,
   uploadPaymentProofController,
@@ -13,6 +15,20 @@ import { validateCreateTransaction } from "../validators/transaction.validator";
 import { fileFilter } from "../lib/fileFilter";
 
 const router = Router();
+
+router.get("/point", verifyToken, getUserPointController);
+router.get(
+  "/chart/:eventid",
+  verifyToken,
+  verifyRole(["ADMIN", "SUPERADMIN"]),
+  getEventTransChartController
+);
+router.get(
+  "/:eventid",
+  verifyToken,
+  verifyRole(["ADMIN", "SUPERADMIN"]),
+  getEventTransactionController
+);
 
 router.post(
   "/",
@@ -42,7 +58,5 @@ router.post(
   verifyRole(["ADMIN", "SUPERADMIN"]),
   rejectingTransactionController
 );
-
-router.get("/point", verifyToken, getUserPointController);
 
 export default router;
