@@ -9,6 +9,8 @@ import { rejectingTransactionService } from "../services/transactions/rejecting-
 import { Result } from "express-validator";
 import { log } from "console";
 import { getUserPointService } from "../services/transactions/get-user-point.service";
+import { getEventTransactionService } from "../services/transactions/get-event-trasaction.service";
+import { getEventTransChartService } from "../services/transactions/get-event-trans-chart.service";
 
 export const getTransactionController = async (
   req: Request,
@@ -118,6 +120,48 @@ export const getUserPointController = async (
 
     const result = await getUserPointService(authUserId);
 
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEventTransactionController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const { eventid } = req.params;
+    const query = {
+      page: parseInt(req.query.page as string) || 1,
+      take: parseInt(req.query.take as string) || 10,
+      sortOrder: (req.query.sortOrder as string) || "desc",
+      sortBy: (req.query.sortBy as string) || "updatedAt",
+      search: (req.query.search as string) || "",
+      date: (req.query.date as string) || null,
+      ticket: (req.query.ticket as string) || "",
+    };
+    const result = await getEventTransactionService(eventid, authUserId, query);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getEventTransChartController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const { eventid } = req.params;
+    const query = {
+      datefrom: (req.query.datefrom as string) || null,
+    };
+    const result = await getEventTransChartService(authUserId, eventid, query);
     res.status(200).send(result);
   } catch (error) {
     next(error);

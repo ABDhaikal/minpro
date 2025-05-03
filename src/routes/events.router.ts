@@ -2,9 +2,13 @@ import { Router } from "express";
 import {
   createEventController,
   getCategoryController,
+  getEventAtendeeController,
   getEventController,
+  getEventOrgLocController,
   getEventsController,
   getLocationsEventController,
+  getOrganizerEventsController,
+  getOrgDetailEventController,
   publishEventController,
 } from "../controllers/events.controller";
 import { verifyRole } from "../middlewares/role.middleware";
@@ -16,8 +20,32 @@ import { fileFilter } from "../lib/fileFilter";
 const router = Router();
 
 router.get("/", getEventsController);
+router.get(
+  "/organizer",
+  verifyToken,
+  verifyRole(["ADMIN"]),
+  getOrganizerEventsController
+);
+router.get(
+  "/organizer/:id",
+  verifyToken,
+  verifyRole(["ADMIN"]),
+  getOrgDetailEventController
+);
+router.get(
+  "/attendees/:eventId",
+  verifyToken,
+  verifyRole(["ADMIN"]),
+  getEventAtendeeController
+);
 router.get("/categories", getCategoryController);
 router.get("/locations", getLocationsEventController);
+router.get(
+  "/locations/organizer",
+  verifyToken,
+  verifyRole(["ADMIN"]),
+  getEventOrgLocController
+);
 router.get("/:slug", getEventController);
 
 router.post(

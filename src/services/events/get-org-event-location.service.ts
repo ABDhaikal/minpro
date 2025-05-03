@@ -1,10 +1,23 @@
 import prisma from "../../config/prisma";
 import { ApiError } from "../../utils/api-error";
 
-export const getEvenLocationsService = async () => {
+export const getEventOrgLocService = async (authid: string) => {
+  const existingOrganizer = await prisma.organizer.findFirst({
+    where: {
+      users: {
+        id: authid,
+        role: "ADMIN",
+      },
+      deletedAt: null,
+    },
+  });
+  if (!existingOrganizer) {
+    throw new ApiError("Organizer not found", 404);
+  }
   const locations = await prisma.event.findMany({
     where: {
-      deletedAt: null, // Ensure that only non-deleted events are considered
+      deletedAt: null,
+      organizerId: existingOrganizer.id,
     },
     orderBy: {
       location: "asc", // Sort locations in ascending order
@@ -22,5 +35,5 @@ export const getEvenLocationsService = async () => {
 
   const data = locations.map((item) => item.location);
 
-  return data;
+  return { data: data, message: "Location retrieved successfully" };
 };

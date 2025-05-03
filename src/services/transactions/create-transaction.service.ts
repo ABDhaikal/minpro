@@ -91,6 +91,9 @@ export const createTransactionService = async (
     let eventid = "";
     await Promise.all(
       body.tickets.map(async (ticketsFinding) => {
+        if(ticketsFinding.amount <= 0) {
+          throw new ApiError("Ticket amount must be greater than 0", 400);
+        }
         const data = await tx.ticket.findFirst({
           where: { id: ticketsFinding.ticketId, deletedAt: null },
           include: {

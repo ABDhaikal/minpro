@@ -1,4 +1,3 @@
-import { log } from "console";
 import prisma from "../../config/prisma";
 import { ApiError } from "../../utils/api-error";
 
