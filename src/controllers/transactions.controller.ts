@@ -11,6 +11,7 @@ import { log } from "console";
 import { getUserPointService } from "../services/transactions/get-user-point.service";
 import { getEventTransactionService } from "../services/transactions/get-event-trasaction.service";
 import { getEventTransChartService } from "../services/transactions/get-event-trans-chart.service";
+import { getOrgTransDetailService } from "../services/transactions/get-org-trans-detail.service";
 
 export const getTransactionController = async (
   req: Request,
@@ -162,6 +163,23 @@ export const getEventTransChartController = async (
       datefrom: (req.query.datefrom as string) || null,
     };
     const result = await getEventTransChartService(authUserId, eventid, query);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrgTransDetailController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { reciptNumber } = req.params;
+    const authUserId = res.locals.user.id;
+
+    const result = await getOrgTransDetailService(authUserId, reciptNumber);
+
     res.status(200).send(result);
   } catch (error) {
     next(error);

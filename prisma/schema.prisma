@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -41,7 +41,7 @@ model UserPoint {
   id        String    @id @default(cuid()) //primary key
   userId    String    @unique
   amount    Int       @default(0)
-  expiredAt DateTime?
+  expiredAt DateTime  @default(now())
   updateAt  DateTime  @updatedAt
   createdAt DateTime  @default(now())
   deletedAt DateTime?
@@ -53,21 +53,22 @@ model UserPoint {
 }
 
 model Transaction {
-  id                    String            @id @default(cuid())
-  reciptNumber          String            @unique @default(uuid())
-  userId                String
-  status                TransactionStatus @default(WAITING_FOR_PAYMENT)
-  pointsUsed            Int
-  totalDecreaseDiscount Int
-  totalPercentDiscount  Int
-  totalPrice            Int
-  paymentDeadline       DateTime
-  paymentProof          String?
-  organizerDeadline     DateTime?
-  transactionDetail     String?
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
-  deletedAt             DateTime?
+  id                       String            @id @default(cuid())
+  reciptNumber             String            @unique @default(uuid())
+  userId                   String
+  status                   TransactionStatus @default(WAITING_FOR_PAYMENT)
+  pointsUsed               Float
+  pointsExpiredAt          DateTime          @default(now())
+  totalDecreaseDiscount    Float
+  totalPercentDiscount     Float
+  totalPrice               Float
+  totalPriceBeforeDiscount Float
+  paymentDeadline          DateTime
+  paymentProof             String?
+  organizerDeadline        DateTime?
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
+  deletedAt                DateTime?
 
   // relation
   users              User                 @relation(fields: [userId], references: [id])
@@ -149,7 +150,7 @@ model Organizer {
   organizerPicture String?
   description      String
   bankTarget       String
-  paymentTarget    String    
+  paymentTarget    String
   updatedAt        DateTime  @updatedAt
   createdAt        DateTime  @default(now())
   deletedAt        DateTime?
@@ -351,7 +352,7 @@ model userEventTicket {
   ticketId    String
   quantity    Int
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt 
+  updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
   // relation
