@@ -21,7 +21,6 @@ export const getEventTransChartService = async (
   eventid: string,
   queries: IGetEventTransChartService
 ) => {
-  console.log("eventid", eventid);
   const existingEvent = await prisma.event.findUnique({
     where: {
       id: eventid,
@@ -41,7 +40,6 @@ export const getEventTransChartService = async (
   });
 
   if (!existingEvent) {
-    console.log("event not found", existingEvent);
     throw new ApiError("Event not found ", 404);
   }
   if (existingEvent.organizers.users.id !== authUserId) {
@@ -85,7 +83,6 @@ export const getEventTransChartService = async (
 
   // check if datefrom is less than equal one day from today
   let isSplitByHour = false;
-  console.log("data.datefrom", queries.datefrom);
   if (queries.datefrom) {
     const dateFrom = new Date(queries.datefrom);
     const today = new Date();
@@ -93,18 +90,17 @@ export const getEventTransChartService = async (
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     if (diffDays <= 1) {
       isSplitByHour = true;
-      console.log("isSplitByHour", isSplitByHour);
     }
   }
   const today = new Date().toISOString().split("T")[0]; // Get the date part only
   transactions.forEach((transaction) => {
     let date = transaction.createdAt.toISOString().split("T")[0]; // Get the date part only
     if (isSplitByHour) {
-      const timeParts = transaction.createdAt.toISOString().split(":");
-      date = timeParts.slice(0, timeParts.length - 2).join(":"); // Remove the last index and join back
+      date = transaction.createdAt.toISOString();
+      // const timeParts = transaction.createdAt.toISOString().split(":");
+      // date = timeParts.slice(0, timeParts.length - 2).join(":")+ ":00:00.00Z"; // Remove the last index and join back
     }
 
-    
     const status = transaction.status;
     const quantity = transaction.transactionTicket.reduce(
       (acc, ticket) => acc + ticket.quantity,
@@ -128,7 +124,7 @@ export const getEventTransChartService = async (
         REJECTED: 0,
         EXPIRED: 0,
         CANCELED: 0,
-        [status]: quantity,
+        [status]: 1,
       });
     }
     if (existingTicketGroup) {

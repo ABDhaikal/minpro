@@ -34,8 +34,9 @@ export const createTransactionService = async (
       throw new Error("User not found");
     }
 
+    let pointExpiredAt = new Date();
     if (body.pointsUsed) {
-      const userPoint = await prisma.userPoint.findFirst({
+      const userPoint = await tx.userPoint.findFirst({
         where: {
           userId: user.id,
         },
@@ -44,11 +45,12 @@ export const createTransactionService = async (
       if (!userPoint || userPoint.amount < body.pointsUsed) {
         throw new ApiError("User doesnt have enough point", 400);
       }
+      pointExpiredAt = userPoint.expiredAt;
     } else {
       body.pointsUsed = 0;
     }
 
-    let discountPercent = 1;
+    let discountPercent = 0;
     let discountdecrease = 0;
 
     if (body.cuponID && body.cuponID.length > 0) {
@@ -73,9 +75,8 @@ export const createTransactionService = async (
             discountdecrease += data.amount;
           }
           if (data.type === "PERCENTAGE") {
-            const pengkalinya = 1 - data.amount / 100;
-            const yangharusdibayar = discountPercent * pengkalinya;
-            discountPercent = yangharusdibayar;
+            discountPercent =
+              discountPercent + ((100 - discountPercent) * data.amount) / 100;
           }
           await tx.cuponDiscount.update({
             where: {
@@ -87,11 +88,11 @@ export const createTransactionService = async (
       );
     }
 
-    let totalPrice = 0;
+    let PriceBeforDiscount = 0;
     let eventid = "";
     await Promise.all(
       body.tickets.map(async (ticketsFinding) => {
-        if(ticketsFinding.amount <= 0) {
+        if (ticketsFinding.amount <= 0) {
           throw new ApiError("Ticket amount must be greater than 0", 400);
         }
         const data = await tx.ticket.findFirst({
@@ -133,7 +134,7 @@ export const createTransactionService = async (
             },
           },
         });
-        totalPrice += ticketsFinding.amount * data.price;
+        PriceBeforDiscount += ticketsFinding.amount * data.price;
       })
     );
 
@@ -181,21 +182,20 @@ export const createTransactionService = async (
 
       discountdecrease += validatingVoucher.amountDiscount;
     }
-
-    totalPrice = totalPrice * discountPercent;
-
-    if (body.pointsUsed && totalPrice - discountdecrease <= 0) {
+    let PriceAfterDiscount =
+      (PriceBeforDiscount * (100 - discountPercent)) / 100;
+    if (body.pointsUsed && PriceAfterDiscount - discountdecrease <= 0) {
       body.pointsUsed = 0;
-      totalPrice = 0;
+      PriceAfterDiscount = 0;
     } else {
-      totalPrice = totalPrice - discountdecrease;
+      PriceAfterDiscount = PriceAfterDiscount - discountdecrease;
     }
 
-    if (body.pointsUsed && totalPrice - body.pointsUsed < 0) {
-      body.pointsUsed = totalPrice;
-      totalPrice = 0;
+    if (body.pointsUsed && PriceAfterDiscount - body.pointsUsed < 0) {
+      body.pointsUsed = PriceAfterDiscount;
+      PriceAfterDiscount = 0;
     } else if (body.pointsUsed) {
-      totalPrice -= body.pointsUsed;
+      PriceAfterDiscount -= body.pointsUsed;
     }
 
     if (body.pointsUsed && body.pointsUsed > 0) {
@@ -210,17 +210,19 @@ export const createTransactionService = async (
     }
 
     let statusTransaction = "WAITING_FOR_PAYMENT";
-    if (totalPrice <= 0) {
+    if (PriceAfterDiscount <= 0) {
       statusTransaction = "WAITING_FOR_ADMIN_CONFIRMATION";
     }
     const newTransaction = await tx.transaction.create({
       data: {
         userId: authUserId,
         pointsUsed: body.pointsUsed,
-        totalPrice: totalPrice,
+        pointsExpiredAt: pointExpiredAt,
+        totalPriceBeforeDiscount: PriceBeforDiscount,
+        totalPrice: PriceAfterDiscount,
         totalDecreaseDiscount: discountdecrease,
         status: statusTransaction as TransactionStatus,
-        totalPercentDiscount: (1 - discountPercent) * 100,
+        totalPercentDiscount: discountPercent,
         paymentDeadline: new Date(
           Date.now() + EXPIRED_PAYMENT_DEADLINE_HOUR * 60 * 60 * 1000
         ),
@@ -292,7 +294,7 @@ export const createTransactionService = async (
         })
       );
     }
-    if (totalPrice > 0) {
+    if (PriceAfterDiscount > 0) {
       await userTransactionQueue.add(
         "new-transaction",
         {

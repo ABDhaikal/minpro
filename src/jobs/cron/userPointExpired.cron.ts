@@ -21,7 +21,6 @@ const userpointExpired = async () => {
             },
          },
          data: {
-            expiredAt: null,
             amount: 0,
          },
       });
