@@ -188,5 +188,8 @@ export const acceptingTransactionService = async (
     return transactionUpdate;
   });
 
-  return result;
+  return {
+    data: result,
+    message: "Transaction accepted successfully",
+  };
 };

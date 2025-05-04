@@ -4,6 +4,7 @@ import {
   createTransactionController,
   getEventTransactionController,
   getEventTransChartController,
+  getOrgTransDetailController,
   getUserPointController,
   rejectingTransactionController,
   uploadPaymentProofController,
@@ -23,6 +24,13 @@ router.get(
   verifyRole(["ADMIN", "SUPERADMIN"]),
   getEventTransChartController
 );
+router.get(
+  "/detail/:reciptNumber",
+  verifyToken,
+  verifyRole(["ADMIN", "SUPERADMIN"]),
+  getOrgTransDetailController
+);
+
 router.get(
   "/:eventid",
   verifyToken,

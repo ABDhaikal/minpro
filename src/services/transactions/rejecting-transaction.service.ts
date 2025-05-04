@@ -139,12 +139,14 @@ export const rejectingTransactionService = async (
 
     // balikin point
     if (transaction.pointsUsed && transaction.pointsUsed > 0) {
-      await tx.userPoint.update({
-        where: {
-          userId: transaction.userId,
-        },
-        data: { amount: { increment: transaction.pointsUsed } },
-      });
+      if (transaction.pointsExpiredAt > new Date()) {
+        await tx.userPoint.update({
+          where: {
+            userId: transaction.userId,
+          },
+          data: { amount: { increment: transaction.pointsUsed } },
+        });
+      }
     }
   });
 
@@ -171,5 +173,5 @@ export const rejectingTransactionService = async (
     html: html,
   });
 
-  return "Transaction has been rejected";
+  return { message: "Transaction has been rejected" };
 };

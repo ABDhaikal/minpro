@@ -95,7 +95,11 @@ export const userTransactionProofWorker = new Worker(
           }
 
           // balikin point
-          if (transaction.pointsUsed && transaction.pointsUsed > 0) {
+          if (
+            transaction.pointsUsed &&
+            transaction.pointsUsed > 0 &&
+            transaction.pointsExpiredAt > new Date()
+          ) {
             await tx.userPoint.update({
               where: {
                 userId: transaction.userId,
