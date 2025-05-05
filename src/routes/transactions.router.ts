@@ -4,6 +4,7 @@ import {
   createTransactionController,
   getEventTransactionController,
   getEventTransChartController,
+  getIncomeController,
   getOrgTransDetailController,
   getUserPointController,
   rejectingTransactionController,
@@ -19,10 +20,16 @@ const router = Router();
 
 router.get("/point", verifyToken, getUserPointController);
 router.get(
-  "/chart/:eventid",
+  "/chart",
   verifyToken,
   verifyRole(["ADMIN", "SUPERADMIN"]),
   getEventTransChartController
+);
+router.get(
+  "/income",
+  verifyToken,
+  verifyRole(["ADMIN", "SUPERADMIN"]),
+  getIncomeController
 );
 router.get(
   "/detail/:reciptNumber",
@@ -32,7 +39,7 @@ router.get(
 );
 
 router.get(
-  "/:eventid",
+  "/organizer",
   verifyToken,
   verifyRole(["ADMIN", "SUPERADMIN"]),
   getEventTransactionController

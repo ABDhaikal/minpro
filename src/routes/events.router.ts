@@ -7,6 +7,7 @@ import {
   getEventOrgLocController,
   getEventsController,
   getLocationsEventController,
+  getOrgAllEventNameController,
   getOrganizerEventsController,
   getOrgDetailEventController,
   publishEventController,
@@ -21,21 +22,27 @@ const router = Router();
 
 router.get("/", getEventsController);
 router.get(
+  "/dropdown-event",
+  verifyToken,
+  verifyRole(["ADMIN", "SUPERADMIN"]),
+  getOrgAllEventNameController
+);
+router.get(
   "/organizer",
   verifyToken,
-  verifyRole(["ADMIN"]),
+  verifyRole(["ADMIN", "SUPERADMIN"]),
   getOrganizerEventsController
 );
 router.get(
   "/organizer/:id",
   verifyToken,
-  verifyRole(["ADMIN"]),
+  verifyRole(["ADMIN", "SUPERADMIN"]),
   getOrgDetailEventController
 );
 router.get(
   "/attendees/:eventId",
   verifyToken,
-  verifyRole(["ADMIN"]),
+  verifyRole(["ADMIN", "SUPERADMIN"]),
   getEventAtendeeController
 );
 router.get("/categories", getCategoryController);

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, StatusEvent, TransactionStatus } from "@prisma/client";
 import prisma from "../../config/prisma";
 import { PaginationQueryParams } from "../../types/pagination";
 import { ApiError } from "../../utils/api-error";
@@ -6,50 +6,84 @@ import { ApiError } from "../../utils/api-error";
 interface IGetEventTransactionService extends PaginationQueryParams {
   search: string;
   date: string | null;
-  ticket: string;
+  ticket: string | null | undefined;
+  status: string | null | undefined;
+  eventid: string | null | undefined;
 }
 
 export const getEventTransactionService = async (
-  eventid: string,
   authUserId: string,
   queries: IGetEventTransactionService
 ) => {
   // validating event id
-  const existingEvent = await prisma.event.findFirst({
+  const existingOrganizer = await prisma.organizer.findFirst({
     where: {
-      id: eventid,
+      userId: authUserId,
       deletedAt: null,
     },
-
     include: {
-      organizers: {
+      events: {
         select: {
-          users: {
-            select: {
-              id: true,
-            },
-          },
+          id: true,
         },
       },
     },
   });
-
-  if (!existingEvent) {
-    throw new ApiError("Event not found ", 404);
+  if (!existingOrganizer) {
+    throw new ApiError("Organizer not found", 404);
   }
-  if (existingEvent.organizers.users.id !== authUserId) {
-    throw new ApiError("Unauthorized to access this event", 401);
-  }
+  if (queries.eventid) {
+    const existingEvent = await prisma.event.findFirst({
+      where: {
+        id: queries.eventid,
+        deletedAt: null,
+      },
 
+      include: {
+        organizers: {
+          select: {
+            users: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!existingEvent) {
+      throw new ApiError("Event not found ", 404);
+    }
+    if (existingEvent.organizers.users.id !== authUserId) {
+      throw new ApiError("Unauthorized to access this event", 401);
+    }
+  }
   // validating query
   const { page, take, sortBy, sortOrder, search, date } = queries;
   const whereClauseTransaction: Prisma.TransactionWhereInput = {};
 
+  queries.eventid =
+    queries.eventid === "" || !queries.eventid ? undefined : queries.eventid;
+
+  queries.ticket =
+    queries.ticket === "" || !queries.ticket ? undefined : queries.ticket;
+
+  queries.status =
+    queries.status === "" || !queries.status ? undefined : queries.status;
+
   whereClauseTransaction.transactionTicket = {
     some: {
       tickets: {
-        eventId: eventid,
+        name: queries.ticket
+          ? { contains: queries.ticket, mode: "insensitive" }
+          : undefined,
+        eventId: queries.eventid,
         deletedAt: null,
+        events: {
+          organizerId: existingOrganizer.id,
+          deletedAt: null,
+        },
       },
     },
   };
@@ -60,14 +94,13 @@ export const getEventTransactionService = async (
     };
   }
 
-  if (queries.ticket) {
-    whereClauseTransaction.transactionTicket = {
-      some: {
-        tickets: {
-          name: { contains: queries.ticket, mode: "insensitive" },
-        },
-      },
-    };
+  if (
+    queries.status &&
+    Object.values(TransactionStatus).includes(
+      queries.status as TransactionStatus
+    )
+  ) {
+    whereClauseTransaction.status = queries.status as TransactionStatus;
   }
 
   if (queries.date) {
