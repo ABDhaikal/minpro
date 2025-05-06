@@ -15,12 +15,23 @@ export const validateCreateEvent = [
     .notEmpty()
     .withMessage("Event name is required and must be a string")
     .isString()
-    .withMessage("Event name is required and must be a string"),
+    .withMessage("Event name is required and must be a string")
+    .trim()
+    .isLength({
+      min: 5,
+      max: 50,
+    })
+    .withMessage("Event name must be between 3 and 50 characters long")
+    .matches(/^[a-zA-Z0-9 ]*$/)
+    .withMessage("Event name must not contain special characters"),
   body("description")
     .notEmpty()
     .withMessage("description is required and must be a string")
     .isString()
-    .withMessage("description is required and must be a string"),
+    .withMessage("description is required and must be a string")
+    .isLength({
+      min: 20,
+    }),
   body("location")
     .isIn(Object.values(Location))
     .withMessage("Invalid location"),

@@ -12,11 +12,11 @@ import {
   getOrgDetailEventController,
   publishEventController,
 } from "../controllers/events.controller";
-import { verifyRole } from "../middlewares/role.middleware";
-import { verifyToken } from "../lib/jwt";
-import { validateCreateEvent } from "../validators/event.validator";
-import { uploader } from "../lib/multer";
 import { fileFilter } from "../lib/fileFilter";
+import { verifyToken } from "../lib/jwt";
+import { uploader } from "../lib/multer";
+import { verifyRole } from "../middlewares/role.middleware";
+import { validateCreateEvent } from "../validators/event.validator";
 
 const router = Router();
 

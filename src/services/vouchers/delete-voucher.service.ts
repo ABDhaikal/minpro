@@ -32,32 +32,13 @@ export const deleteVoucherService = async (
     throw new ApiError("forbidden", 403);
   }
 
-  if (voucher.deletedAt && voucher.events.status !== "DRAFT") {
-    throw new ApiError("Voucher already deleted", 400);
-  }
+  const deletedVoucher = await prisma.eventVoucher.delete({
+    where: { id: voucherId },
+  });
 
-  if (voucher.events.status === "DRAFT") {
-    const deletedVoucher = await prisma.eventVoucher.delete({
-      where: { id: voucherId },
-    });
-
-    return {
-      success: true,
-      message: "Voucher deleted successfully",
-      data: deletedVoucher,
-    };
-  } else {
-    const deletedVoucher = await prisma.eventVoucher.update({
-      where: { id: voucherId },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
-
-    return {
-      success: true,
-      message: "Voucher deleted successfully",
-      data: deletedVoucher,
-    };
-  }
+  return {
+    success: true,
+    message: "Voucher deleted successfully",
+    data: deletedVoucher,
+  };
 };

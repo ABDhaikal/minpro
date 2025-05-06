@@ -9,7 +9,6 @@ export const createEventService = async (
   data: Omit<Event, "slug" | "createdAt" | "deletedAt" | "updatedAt">,
   eventPict: Express.Multer.File | undefined
 ) => {
-  
   const organizer = await prisma.organizer.findUnique({
     where: { userId: authID },
   });
@@ -30,7 +29,6 @@ export const createEventService = async (
     throw new ApiError("Event name already exists");
   }
 
-  
   const slug = slugify(data.name, {
     replacement: "_",
     lower: true,
@@ -71,7 +69,7 @@ export const createEventService = async (
     eventPictUrl = eventLama!.image;
   }
 
-  if (data.id) {
+  if (isUpdate) {
     const event = await prisma.event.findUnique({
       where: { id: data.id },
     });
@@ -94,13 +92,15 @@ export const createEventService = async (
         name: data.name,
         slug: slug,
         description: data.description,
-        status: "DRAFT",
         location: data.location,
         eventStart: data.eventStart,
         image: eventPictUrl,
         eventEnd: data.eventEnd,
       },
     });
+    if (!updateEvent) {
+      throw new ApiError("Failed to update event", 500);
+    }
   } else {
     if (!eventPict) {
       throw new ApiError("Event picture is required", 400);
@@ -119,6 +119,9 @@ export const createEventService = async (
         eventEnd: data.eventEnd,
       },
     });
+    if (!createdEvent) {
+      throw new ApiError("Failed to create event", 500);
+    }
   }
 
   return {

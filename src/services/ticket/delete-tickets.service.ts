@@ -29,33 +29,17 @@ export const deleteTicketService = async (authID: string, ticketId: string) => {
   if (ticket.buyed > 0) {
     throw new ApiError("Ticket already buyed, cant be delete", 400);
   }
-  
-  if (ticket.deletedAt && ticket.events.status !== "DRAFT") {
-    throw new ApiError("Ticket already deleted", 400);
+
+  const deletedTicket = await prisma.ticket.delete({
+    where: { id: ticketId },
+  });
+
+  if (!deletedTicket) {
+    throw new ApiError("Failed to delete ticket", 500);
   }
-
-  if (ticket.events.status === "DRAFT") {
-    const deletedTicket = await prisma.ticket.delete({
-      where: { id: ticketId },
-    });
-
-    return {
-      success: true,
-      message: "Voucher deleted successfully",
-      data: deletedTicket,
-    };
-  } else {
-    const deletedTicket = await prisma.ticket.update({
-      where: { id: ticketId },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
-
-    return {
-      success: true,
-      message: "Ticket deleted successfully",
-      data: deletedTicket,
-    };
-  }
+  return {
+    success: true,
+    message: "ticket deleted successfully",
+    data: deletedTicket,
+  };
 };
