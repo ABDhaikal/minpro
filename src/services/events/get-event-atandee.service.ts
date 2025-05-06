@@ -1,8 +1,7 @@
-import { query } from "express-validator";
-import prisma from "../../config/prisma";
-import { ApiError } from "../../utils/api-error";
-import { PaginationQueryParams } from "../../types/pagination";
 import { Prisma } from "@prisma/client";
+import prisma from "../../config/prisma";
+import { PaginationQueryParams } from "../../types/pagination";
+import { ApiError } from "../../utils/api-error";
 
 interface getAttQuery extends PaginationQueryParams {
   search: string;

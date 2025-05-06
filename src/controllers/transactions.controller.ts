@@ -1,17 +1,15 @@
-import { Request, Response, NextFunction } from "express";
-import { createTransactionService } from "../services/transactions/create-transaction.service";
-import { uploadPaymentProofService } from "../services/transactions/upload-proof-payment.service";
-import multer from "multer";
-import { ApiError } from "../utils/api-error";
-import { getTransactionsService } from "../services/transactions/get-transactions.service";
+import { NextFunction, Request, Response } from "express";
 import { acceptingTransactionService } from "../services/transactions/accepting-transaction.service";
-import { rejectingTransactionService } from "../services/transactions/rejecting-transaction.service";
-import { Result } from "express-validator";
-import { log } from "console";
-import { getUserPointService } from "../services/transactions/get-user-point.service";
-import { getEventTransactionService } from "../services/transactions/get-event-trasaction.service";
+import { createTransactionService } from "../services/transactions/create-transaction.service";
 import { getEventTransChartService } from "../services/transactions/get-event-trans-chart.service";
+import { getEventTransactionService } from "../services/transactions/get-event-trasaction.service";
+import { getIncomeService } from "../services/transactions/get-income.service";
 import { getOrgTransDetailService } from "../services/transactions/get-org-trans-detail.service";
+import { getTransactionsService } from "../services/transactions/get-transactions.service";
+import { getUserPointService } from "../services/transactions/get-user-point.service";
+import { rejectingTransactionService } from "../services/transactions/rejecting-transaction.service";
+import { uploadPaymentProofService } from "../services/transactions/upload-proof-payment.service";
+import { ApiError } from "../utils/api-error";
 
 export const getTransactionController = async (
   req: Request,
@@ -134,7 +132,6 @@ export const getEventTransactionController = async (
 ) => {
   try {
     const authUserId = res.locals.user.id;
-    const { eventid } = req.params;
     const query = {
       page: parseInt(req.query.page as string) || 1,
       take: parseInt(req.query.take as string) || 10,
@@ -143,8 +140,10 @@ export const getEventTransactionController = async (
       search: (req.query.search as string) || "",
       date: (req.query.date as string) || null,
       ticket: (req.query.ticket as string) || "",
+      eventid: (req.query.eventid as string) || null,
+      status: (req.query.status as string) || null,
     };
-    const result = await getEventTransactionService(eventid, authUserId, query);
+    const result = await getEventTransactionService(authUserId, query);
     res.status(200).send(result);
   } catch (error) {
     next(error);
@@ -158,11 +157,11 @@ export const getEventTransChartController = async (
 ) => {
   try {
     const authUserId = res.locals.user.id;
-    const { eventid } = req.params;
     const query = {
-      datefrom: (req.query.datefrom as string) || null,
+      datefrom: (req.query.datefrom as string) || undefined,
+      eventid: (req.query.eventid as string) || undefined,
     };
-    const result = await getEventTransChartService(authUserId, eventid, query);
+    const result = await getEventTransChartService(authUserId, query);
     res.status(200).send(result);
   } catch (error) {
     next(error);
@@ -180,6 +179,23 @@ export const getOrgTransDetailController = async (
 
     const result = await getOrgTransDetailService(authUserId, reciptNumber);
 
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getIncomeController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const query = {
+      eventid: (req.query.eventid as string) || undefined,
+    };
+    const result = await getIncomeService(authUserId, query);
     res.status(200).send(result);
   } catch (error) {
     next(error);

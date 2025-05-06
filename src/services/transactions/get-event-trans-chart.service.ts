@@ -3,7 +3,8 @@ import prisma from "../../config/prisma";
 import { ApiError } from "../../utils/api-error";
 
 interface IGetEventTransChartService {
-  datefrom: string | null;
+  datefrom: string | null | undefined;
+  eventid: string | null | undefined;
 }
 
 interface groupedTransactions {
@@ -18,44 +19,69 @@ interface groupedTransactions {
 
 export const getEventTransChartService = async (
   authUserId: string,
-  eventid: string,
   queries: IGetEventTransChartService
 ) => {
-  const existingEvent = await prisma.event.findUnique({
+  const existingOrganizer = await prisma.organizer.findUnique({
     where: {
-      id: eventid,
+      userId: authUserId,
       deletedAt: null,
     },
     include: {
-      organizers: {
+      events: {
         select: {
-          users: {
-            select: {
-              id: true,
-            },
-          },
+          id: true,
         },
       },
     },
   });
-
-  if (!existingEvent) {
-    throw new ApiError("Event not found ", 404);
-  }
-  if (existingEvent.organizers.users.id !== authUserId) {
-    throw new ApiError("Unauthorized to access this event", 401);
+  if (!existingOrganizer) {
+    throw new ApiError("User is not an organizer", 401);
   }
 
+  if (queries.eventid) {
+    const existingEvent = await prisma.event.findUnique({
+      where: {
+        id: queries.eventid,
+        deletedAt: null,
+      },
+      include: {
+        organizers: {
+          select: {
+            users: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!existingEvent) {
+      throw new ApiError("Event not found ", 404);
+    }
+    if (existingEvent.organizers.users.id !== authUserId) {
+      throw new ApiError("Unauthorized to access this event", 401);
+    }
+  }
   const whereClauseTransaction: Prisma.TransactionWhereInput = {};
   whereClauseTransaction.deletedAt = null;
+  queries.eventid =
+    !queries.eventid || queries.eventid === "" ? undefined : queries.eventid;
+
   whereClauseTransaction.transactionTicket = {
     some: {
       tickets: {
-        eventId: eventid,
+        events: {
+          id: queries.eventid,
+          organizerId: existingOrganizer.id,
+        },
         deletedAt: null,
       },
+      deletedAt: null,
     },
   };
+
   whereClauseTransaction.createdAt = {
     gte: queries.datefrom ? new Date(queries.datefrom) : undefined,
   };
@@ -80,7 +106,24 @@ export const getEventTransChartService = async (
   // grouping the transactions by date
   let groupedTransactions: groupedTransactions[] = [];
   let groupedTicket: groupedTransactions[] = [];
-
+  let TotalGroupedTransactions: groupedTransactions = {
+    date: "Total",
+    WAITING_FOR_PAYMENT: 0,
+    WAITING_FOR_ADMIN_CONFIRMATION: 0,
+    DONE: 0,
+    REJECTED: 0,
+    EXPIRED: 0,
+    CANCELED: 0,
+  };
+  let TotalGroupedTicket: groupedTransactions = {
+    date: "Total",
+    WAITING_FOR_PAYMENT: 0,
+    WAITING_FOR_ADMIN_CONFIRMATION: 0,
+    DONE: 0,
+    REJECTED: 0,
+    EXPIRED: 0,
+    CANCELED: 0,
+  };
   // check if datefrom is less than equal one day from today
   let isSplitByHour = false;
   if (queries.datefrom) {
@@ -97,8 +140,6 @@ export const getEventTransChartService = async (
     let date = transaction.createdAt.toISOString().split("T")[0]; // Get the date part only
     if (isSplitByHour) {
       date = transaction.createdAt.toISOString();
-      // const timeParts = transaction.createdAt.toISOString().split(":");
-      // date = timeParts.slice(0, timeParts.length - 2).join(":")+ ":00:00.00Z"; // Remove the last index and join back
     }
 
     const status = transaction.status;
@@ -106,7 +147,8 @@ export const getEventTransChartService = async (
       (acc, ticket) => acc + ticket.quantity,
       0
     );
-
+    TotalGroupedTicket[status] += quantity;
+    TotalGroupedTransactions[status] += 1;
     const existingGroup = groupedTransactions.find(
       (group) => group.date === date
     );
@@ -144,7 +186,12 @@ export const getEventTransChartService = async (
   });
 
   return {
-    data: { transactions: groupedTransactions, ticket: groupedTicket },
+    data: {
+      transactions: groupedTransactions,
+      tickets: groupedTicket,
+      totalTransactions: TotalGroupedTransactions,
+      totalTickets: TotalGroupedTicket,
+    },
 
     message: "Transactions fetched successfully",
   };

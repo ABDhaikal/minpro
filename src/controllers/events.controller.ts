@@ -11,6 +11,7 @@ import { getOrganizerEventsService } from "../services/events/get-organizer-even
 import { getOrgDetailEventService } from "../services/events/get-org-detail-event.service";
 import { getEventOrgLocService } from "../services/events/get-org-event-location.service";
 import { getEventAtendeeService } from "../services/events/get-event-atandee.service";
+import { getOrgAllEventNameService } from "../services/events/get-org-all-event-name.service";
 
 export const getEventsController = async (
   req: Request,
@@ -177,6 +178,20 @@ export const getEventAtendeeController = async (
       ticket: (req.query.ticket as string) || "",
     };
     const result = await getEventAtendeeService(authUserId, eventId, query);
+    res.status(200).send(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrgAllEventNameController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const result = await getOrgAllEventNameService(authUserId);
     res.status(200).send(result);
   } catch (error) {
     next(error);

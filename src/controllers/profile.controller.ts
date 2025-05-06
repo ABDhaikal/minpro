@@ -5,6 +5,7 @@ import { updateProfileService } from "../services/profiles/update-profile.servic
 import { updateUsernameService } from "../services/profiles/update-username.service";
 import { updateEmailService } from "../services/profiles/update-email.service";
 import { validatingEmailService } from "../services/profiles/validating-email.service";
+import { getOrganizerProfileService } from "../services/profiles/get-organizer-profile.service";
 
 export const UpdateProfileController = async (
   req: Request,
@@ -60,7 +61,7 @@ export const updateOrganizerController = async (
   try {
     const authUserId = res.locals.user.id;
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-    const picture = files.picture?.[0];
+    const picture = files.organizerPict?.[0];
     const user = await updateOrganizerService(authUserId, req.body, picture);
     res.status(200).json(user);
   } catch (error) {
@@ -94,4 +95,18 @@ export const validatingEmailController = async (
   } catch (error) {
     return next(error);
   }
-}
+};
+
+export const getOrganizerProfileController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authUserId = res.locals.user.id;
+    const user = await getOrganizerProfileService(authUserId);
+    res.status(200).json(user);
+  } catch (error) {
+    return next(error);
+  }
+};

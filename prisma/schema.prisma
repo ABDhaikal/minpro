@@ -47,7 +47,7 @@ model UserPoint {
   deletedAt DateTime?
 
   // relation
-  users User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
   @@map("users_points")
 }
@@ -254,9 +254,9 @@ model Ticket {
 
   //relation
   events            Event               @relation(fields: [eventId], references: [id])
-  transactionTicket transactionTicket[]
+  transactionTickets transactionTicket[]
   Carts              Cart[]
-  userEventTicket   UserEventTicket[]
+  userEventTickets   UserEventTicket[]
 
   @@map("tickets")
 }
