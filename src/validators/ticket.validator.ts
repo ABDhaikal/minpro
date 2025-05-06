@@ -3,16 +3,18 @@ import { body, validationResult } from "express-validator";
 import { ApiError } from "../utils/api-error";
 
 export const validateCreateTicket = [
-  // body("eventId")
-  //   .isString()
-  //   .notEmpty()
-  //   .withMessage("Event ID is required and must be a non-empty string"),
-
   body("name")
     .isString()
     .notEmpty()
     .trim()
-    .withMessage("Ticket name is required and must be a non-empty string"),
+    .withMessage("Ticket name is required and must be a non-empty string")
+    .isLength({
+      min: 3,
+      max: 20,
+    })
+    .withMessage("Ticket name must be between 3 and 20 characters long")
+    .matches(/^[a-zA-Z0-9 ]*$/)
+    .withMessage("Ticket name must not contain special characters"),
 
   body("amount")
     .isInt({ min: 1 })
@@ -39,7 +41,14 @@ export const validateUpdateTicket = [
     .isString()
     .notEmpty()
     .trim()
-    .withMessage("Ticket name is required and must be a non-empty string"),
+    .withMessage("Ticket name is required and must be a non-empty string")
+    .isLength({
+      min: 3,
+      max: 20,
+    })
+    .withMessage("Ticket name must be between 3 and 20 characters long")
+    .matches(/^[a-zA-Z0-9 ]*$/)
+    .withMessage("Ticket name must not contain special characters"),
 
   body("amount")
     .isInt({ min: 1 })

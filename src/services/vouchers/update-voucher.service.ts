@@ -38,7 +38,7 @@ export const updateVoucherService = async (
     },
   });
 
-  if (validatingNameVoucher && validatingNameVoucher.id !== data.id) {
+  if (validatingNameVoucher && validatingNameVoucher.id !== voucherId) {
     throw new ApiError("Voucher name already exists", 400);
   }
 
@@ -47,7 +47,7 @@ export const updateVoucherService = async (
   }
 
   if (voucher.used > data.quota) {
-    throw new ApiError("Voucher quota exceeded", 400);
+    throw new ApiError("Voucher quota cant less than used", 400);
   }
 
   const updatedVoucher = await prisma.eventVoucher.update({
@@ -59,7 +59,7 @@ export const updateVoucherService = async (
       amountDiscount: data.amountDiscount,
       quota: data.quota,
       startDate: data.startDate,
-      endDate: data.endDate
+      endDate: data.endDate,
     },
   });
 

@@ -45,7 +45,7 @@ export const updateTicketService = async (
   }
 
   if (ticket.buyed > data.amount) {
-    throw new ApiError("Ticket quota exceeded", 400);
+    throw new ApiError("Ticket quota cant less than buyed", 400);
   }
 
   // Buat voucher baru

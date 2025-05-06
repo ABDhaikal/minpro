@@ -60,6 +60,9 @@ export const createTransactionService = async (
             where: {
               userId: authUserId,
               id: cuponWant2use,
+              expiredAt :{
+                gte: new Date(),
+              },
               deletedAt: null,
             },
           });
