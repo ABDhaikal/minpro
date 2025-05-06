@@ -61,10 +61,10 @@ export const createReviewService = async (
   });
 
   return {
+    data: updatedUserEvent,
     message:
       userEvent.review !== null || userEvent.rating !== null
         ? "Review successfully updated"
         : "Review successfully created",
-    data: updatedUserEvent,
   };
 };

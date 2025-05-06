@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -25,7 +25,7 @@ model User {
   cuponDiscount CuponDiscount[]
   Cart          Cart[]
   organizer     Organizer?
-  usersEvents   usersEvents[]
+  usersEvents   UsersEvents[]
   userPoints    UserPoint?
 
   @@map("users")
@@ -182,7 +182,7 @@ model Event {
   organizers   Organizer      @relation(fields: [organizerId], references: [id])
   eventVoucher EventVoucher[]
   tickets      Ticket[]
-  usersEvents  usersEvents[]
+  usersEvents  UsersEvents[]
 
   @@map("events")
 }
@@ -255,8 +255,8 @@ model Ticket {
   //relation
   events            Event               @relation(fields: [eventId], references: [id])
   transactionTicket transactionTicket[]
-  Cart              Cart[]
-  userEventTicket   userEventTicket[]
+  Carts              Cart[]
+  userEventTicket   UserEventTicket[]
 
   @@map("tickets")
 }
@@ -328,7 +328,7 @@ model Cart {
   @@map("carts")
 }
 
-model usersEvents {
+model UsersEvents {
   id        String    @id @default(cuid()) //primary key
   userId    String
   eventId   String
@@ -339,14 +339,14 @@ model usersEvents {
   deletedAt DateTime?
 
   // relation
-  users           User              @relation(fields: [userId], references: [id])
-  userEventTicket userEventTicket[]
-  events          Event             @relation(fields: [eventId], references: [id])
+  user            User              @relation(fields: [userId], references: [id])
+  userEventTicket UserEventTicket[]
+  event           Event             @relation(fields: [eventId], references: [id])
 
   @@map("users_events")
 }
 
-model userEventTicket {
+model UserEventTicket {
   id          String    @id @default(cuid()) //primary key
   userEventId String
   ticketId    String
@@ -356,8 +356,8 @@ model userEventTicket {
   deletedAt   DateTime?
 
   // relation
-  tickets     Ticket      @relation(fields: [ticketId], references: [id])
-  usersEvents usersEvents @relation(fields: [userEventId], references: [id])
+  ticket     Ticket      @relation(fields: [ticketId], references: [id])
+  usersEvent UsersEvents @relation(fields: [userEventId], references: [id])
 
   @@map("users_event_tickets")
 }

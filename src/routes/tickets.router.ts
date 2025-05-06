@@ -5,6 +5,7 @@ import {
   createTicketController,
   deleteTicketController,
   getTicketsByEventIdController,
+  getUserEventTicketServiceController,
   updateTicketController,
 } from "../controllers/ticket.controller";
 import {
@@ -14,10 +15,8 @@ import {
 
 const router = Router();
 
-router.get(
-  "/:eventId",
-  getTicketsByEventIdController
-);
+router.get("/my-tickets", verifyToken, getUserEventTicketServiceController);
+router.get("/:eventId", getTicketsByEventIdController);
 
 router.post(
   "/:eventId",
