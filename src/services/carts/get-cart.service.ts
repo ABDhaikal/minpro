@@ -8,7 +8,7 @@ export const getCartService = async (userId: string) => {
         some: {
           tickets: {
             some: {
-              Cart: {
+              Carts: {
                 some: {
                   userId: userId,
                 },
@@ -26,7 +26,7 @@ export const getCartService = async (userId: string) => {
         where: {
           tickets: {
             some: {
-              Cart: {
+              Carts: {
                 some: {
                   userId: userId,
                 },
@@ -49,14 +49,14 @@ export const getCartService = async (userId: string) => {
               deletedAt: true,
             },
             where: {
-              Cart: {
+              Carts: {
                 some: {
                   userId: userId,
                 },
               },
             },
             include: {
-              Cart: true,
+              Carts: true,
             },
           },
         },

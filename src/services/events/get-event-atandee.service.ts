@@ -1,8 +1,7 @@
-import { query } from "express-validator";
-import prisma from "../../config/prisma";
-import { ApiError } from "../../utils/api-error";
-import { PaginationQueryParams } from "../../types/pagination";
 import { Prisma } from "@prisma/client";
+import prisma from "../../config/prisma";
+import { PaginationQueryParams } from "../../types/pagination";
+import { ApiError } from "../../utils/api-error";
 
 interface getAttQuery extends PaginationQueryParams {
   search: string;
@@ -43,18 +42,18 @@ export const getEventAtendeeService = async (
   }
 
   const { page, take, sortBy, sortOrder, search, ticket } = query;
-  const whereClause: Prisma.userEventTicketWhereInput = {};
+  const whereClause: Prisma.UserEventTicketWhereInput = {};
   if (ticket) {
-    whereClause.tickets = {
+    whereClause.ticket = {
       name: ticket,
     };
   }
 
   whereClause.deletedAt = null;
-  whereClause.usersEvents = {
+  whereClause.usersEvent = {
     eventId: eventid,
     deletedAt: null,
-    users: {
+    user: {
       username: { contains: search, mode: "insensitive" },
       deletedAt: null,
     },
@@ -65,14 +64,14 @@ export const getEventAtendeeService = async (
     skip: (page - 1) * take,
     orderBy: { [sortBy]: sortOrder },
     include: {
-      tickets: {
+      ticket: {
         select: {
           name: true,
         },
       },
-      usersEvents: {
+      usersEvent: {
         select: {
-          users: {
+          user: {
             select: {
               id: true,
               username: true,

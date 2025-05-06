@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getOrganizerProfileController,
   updateEmailController,
   updateOrganizerController,
   UpdateProfileController,
@@ -7,19 +8,27 @@ import {
   UpdateUsernameController,
   validatingEmailController,
 } from "../controllers/profile.controller";
+import { fileFilter } from "../lib/fileFilter";
 import { verifyToken } from "../lib/jwt";
+import { uploader } from "../lib/multer";
 import { verifyRole } from "../middlewares/role.middleware";
 import {
+  validateEditOrganizer,
   validateUpdateEmail,
   validateUpdateName,
   validateUpdateUserProfile,
 } from "../validators/porfile.validators";
-import { uploader } from "../lib/multer";
-import { fileFilter } from "../lib/fileFilter";
 
 const router = Router();
 
 // Define the all routes for the user router
+
+router.get(
+  "/organizer",
+  verifyToken,
+  verifyRole(["ADMIN"]),
+  getOrganizerProfileController
+);
 
 router.patch(
   "/",
@@ -49,8 +58,9 @@ router.patch(
   "/organizer",
   verifyToken,
   verifyRole(["ADMIN"]),
-  uploader().fields([{ name: "picture", maxCount: 1 }]),
+  uploader().fields([{ name: "organizerPict", maxCount: 1 }]),
   fileFilter(["image/png", "image/jpeg", "image/avif"]),
+  validateEditOrganizer,
   updateOrganizerController
 );
 router.post(

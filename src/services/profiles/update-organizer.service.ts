@@ -88,5 +88,7 @@ export const updateOrganizerService = async (
     },
   });
 
-  return updatedUser;
+  return {
+    message: "Organizer updated successfully",
+  };
 };
