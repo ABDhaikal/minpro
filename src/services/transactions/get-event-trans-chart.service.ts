@@ -139,7 +139,10 @@ export const getEventTransChartService = async (
   transactions.forEach((transaction) => {
     let date = transaction.createdAt.toISOString().split("T")[0]; // Get the date part only
     if (isSplitByHour) {
-      date = transaction.createdAt.toISOString();
+      date = transaction.createdAt.toISOString().split("T")[0]; // Get the date part only
+      const hour = transaction.createdAt.toISOString().split("T")[1].split(":")[0]; // Get the hour part only
+      const minutes = transaction.createdAt.toISOString().split("T")[1].split(":")[1]; // Get the hour part only
+      date = `${date} ${hour}:${minutes}:00`;
     }
 
     const status = transaction.status;
