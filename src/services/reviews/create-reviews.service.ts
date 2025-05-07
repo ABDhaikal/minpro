@@ -1,5 +1,6 @@
 import { ApiError } from "../../utils/api-error";
 import prisma from "../../config/prisma";
+import { log } from "console";
 
 interface ICreateReview {
   eventId: string;
@@ -17,6 +18,8 @@ export const createReviewService = async (
   });
 
   if (!event) {
+    console.log("Event not found");
+    
     throw new ApiError("Event not found", 404);
   }
 
@@ -26,8 +29,8 @@ export const createReviewService = async (
 
   const userEvent = await prisma.usersEvents.findFirst({
     where: {
+      id:eventID,
       userId: authID,
-      eventId: eventID,
       deletedAt: null,
     },
   });
@@ -43,7 +46,7 @@ export const createReviewService = async (
     },
   });
 
-  if (completedTransaction) {
+  if (!completedTransaction) {
     throw new ApiError(
       "You cannot create a review because no completed transaction was found",
       403
