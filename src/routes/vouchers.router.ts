@@ -3,18 +3,18 @@ import {
   createVoucherController,
   deleteVoucherController,
   getVouchersByEventIdController,
-  updateVoucherController
+  updateVoucherController,
 } from "../controllers/vouchers.controller";
 import { verifyToken } from "../lib/jwt";
 import { verifyRole } from "../middlewares/role.middleware";
-import { validateCreateVoucher, validateUpdateVoucher } from "../validators/voucher.validator";
+import {
+  validateCreateVoucher,
+  validateUpdateVoucher,
+} from "../validators/voucher.validator";
 
 const router = Router();
 
-router.get(
-  "/:eventId",
-  getVouchersByEventIdController,
-);
+router.get("/:eventId", getVouchersByEventIdController);
 
 router.post(
   "/:eventId",
@@ -35,7 +35,6 @@ router.put(
 router.delete(
   "/:voucherId",
   verifyToken,
-  validateCreateVoucher,
   verifyRole(["ADMIN", "SUPERADMIN"]),
   deleteVoucherController
 );

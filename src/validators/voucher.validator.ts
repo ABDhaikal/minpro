@@ -7,14 +7,23 @@ export const validateCreateVoucher = [
   body("name")
     .isString()
     .notEmpty()
-    .trim() // Menghapus spasi di awal dan akhir string
-    .withMessage("Voucher name is required and must be a non-empty string"),
+    .withMessage("voucher name cant be empty")
+    .trim()
+    .isLength({
+      min: 3,
+      max: 50,
+    })
+    .withMessage("Voucher name should 3 until 50 character"),
 
   body("amountDiscount")
+    .notEmpty()
+    .withMessage("discount cant be empty")
     .isInt({ min: 1 })
     .withMessage("Amount discount must be a positive integer"),
 
   body("quota")
+    .notEmpty()
+    .withMessage("quota cant be empty")
     .isInt({ min: 1 })
     .withMessage("Quota must be a positive integer"),
 
@@ -22,14 +31,20 @@ export const validateCreateVoucher = [
     .notEmpty()
     .withMessage("Start date is required and must be a string")
     .isISO8601()
-    .withMessage(" Start date must be a valid  date format")
+    .withMessage("Start date must be a valid date format")
     .toDate(),
   body("endDate")
     .notEmpty()
     .withMessage("End date is required and must be a string")
     .isISO8601()
-    .withMessage("End date must be a valid  date format")
-    .toDate(),
+    .withMessage("End date must be a valid date format")
+    .toDate()
+    .custom((endDate, { req }) => {
+      if (new Date(endDate) < new Date(req.body.startDate)) {
+        throw new Error("End date cannot be earlier than start date");
+      }
+      return true;
+    }),
   (req: Request, _res: Response, next: NextFunction) => {
     const errors = validationResult(req);
 
@@ -46,14 +61,23 @@ export const validateUpdateVoucher = [
   body("name")
     .isString()
     .notEmpty()
-    .trim() // Menghapus spasi di awal dan akhir string
-    .withMessage("Voucher name is required and must be a non-empty string"),
+    .withMessage("voucher name cant be empty")
+    .trim()
+    .isLength({
+      min: 3,
+      max: 50,
+    })
+    .withMessage("Voucher name should 3 until 50 character"),
 
   body("amountDiscount")
+    .notEmpty()
+    .withMessage("discount cant be empty")
     .isInt({ min: 1 })
     .withMessage("Amount discount must be a positive integer"),
 
   body("quota")
+    .notEmpty()
+    .withMessage("quota cant be empty")
     .isInt({ min: 1 })
     .withMessage("Quota must be a positive integer"),
 
@@ -61,14 +85,20 @@ export const validateUpdateVoucher = [
     .notEmpty()
     .withMessage("Start date is required and must be a string")
     .isISO8601()
-    .withMessage(" Start date must be a valid  date format")
+    .withMessage("Start date must be a valid date format")
     .toDate(),
   body("endDate")
     .notEmpty()
     .withMessage("End date is required and must be a string")
     .isISO8601()
-    .withMessage("End date must be a valid  date format")
-    .toDate(),
+    .withMessage("End date must be a valid date format")
+    .toDate()
+    .custom((endDate, { req }) => {
+      if (new Date(endDate) < new Date(req.body.startDate)) {
+        throw new Error("End date cannot be earlier than start date");
+      }
+      return true;
+    }),
   (req: Request, _res: Response, next: NextFunction) => {
     const errors = validationResult(req);
 
