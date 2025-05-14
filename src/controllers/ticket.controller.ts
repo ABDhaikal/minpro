@@ -15,8 +15,6 @@ export const createTicketController = async (
     const authID = res.locals.user.id;
     const { eventId } = req.params;
     const body = req.body;
-    console.log("body");
-    console.log(body);
     const result = await createTicketService(authID, eventId, body);
     res.status(200).send({ data: result });
   } catch (error) {

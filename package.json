@@ -4,7 +4,7 @@
    "description": "",
    "main": "index.js",
    "scripts": {
-      "build": "tsc",
+      "build": "tsc && cpx \"src/templates/**/*\" dist/templates",
       "start": "npm run build && node dist/index.js",
       "dev": "nodemon src/index.ts"
    },
@@ -42,5 +42,8 @@
       "slugify": "^1.6.6",
       "ts-node": "^10.9.2",
       "typescript": "^5.8.3"
+   },
+   "devDependencies": {
+      "cpx": "^1.5.0"
    }
 }

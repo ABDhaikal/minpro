@@ -18,8 +18,6 @@ export const createReviewService = async (
   });
 
   if (!event) {
-    console.log("Event not found");
-    
     throw new ApiError("Event not found", 404);
   }
 
@@ -29,7 +27,7 @@ export const createReviewService = async (
 
   const userEvent = await prisma.usersEvents.findFirst({
     where: {
-      id:eventID,
+      id: eventID,
       userId: authID,
       deletedAt: null,
     },

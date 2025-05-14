@@ -7,20 +7,15 @@ export const createReviewController = async (
   next: NextFunction
 ) => {
   try {
-    
     const userId = res.locals.user.id;
     const { eventId } = req.params;
     const { review, rating } = req.body;
-    
-    console.log("req.body");
-    console.log(req.body);
-    console.log("eventId");
-    console.log(eventId);
-    const result = await createReviewService(
-      userId,
+
+    const result = await createReviewService(userId, eventId, {
       eventId,
-      { eventId, review, rating }
-    );
+      review,
+      rating,
+    });
     res.status(200).send({ data: result });
   } catch (error) {
     next(error);
