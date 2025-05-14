@@ -4,6 +4,7 @@ import { deleteTicketService } from "../services/ticket/delete-tickets.service";
 import { Ticket } from "@prisma/client";
 import { updateTicketService } from "../services/ticket/update-tickets.service";
 import { getTicketsByEventIdService } from "../services/ticket/get-tickets.service";
+import { getUserEventTicketsService } from "../services/ticket/get-user-event-tickets.service";
 
 export const createTicketController = async (
   req: Request,
@@ -71,6 +72,21 @@ export const getTicketsByEventIdController = async (
     res
       .status(200)
       .send({ success: true, message: result.message, data: result.data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserEventTicketServiceController = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authID = res.locals.user.id;
+    const result = await getUserEventTicketsService(authID);
+
+    res.status(200).send({ message: result.message, data: result.data });
   } catch (error) {
     next(error);
   }

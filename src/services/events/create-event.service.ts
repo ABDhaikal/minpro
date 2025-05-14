@@ -122,6 +122,10 @@ export const createEventService = async (
     if (!createdEvent) {
       throw new ApiError("Failed to create event", 500);
     }
+    return {
+      message: "Event created successfully",
+      data: createdEvent,
+    };
   }
 
   return {

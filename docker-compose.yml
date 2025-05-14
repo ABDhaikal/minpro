@@ -14,18 +14,18 @@ services:
   #     - express_network
   #   command: sh -c "npx prisma db push"
 
-  # db:
-  #   image: postgres
-  #   container_name: postgres_container
-  #   restart: always
-  #   environment:
-  #     - POSTGRES_PASSWORD=admin
-  #   volumes:
-  #     - ./docker/postgres:/var/lib/postgresql/data
-  #   ports:
-  #     - '7654:5432'
-  #   networks:
-  #     - express_network
+  db:
+    image: postgres
+    container_name: postgres_container
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=admin
+    volumes:
+      - ./docker/postgres:/var/lib/postgresql/data
+    ports:
+      - '7654:5432'
+    networks:
+      - express_network
 
   redis:
     image: redis

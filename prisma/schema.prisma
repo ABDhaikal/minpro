@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   // directUrl = env("DIRECT_URL")
 }
 
@@ -339,9 +339,9 @@ model UsersEvents {
   deletedAt DateTime?
 
   // relation
-  user           User              @relation(fields: [userId], references: [id])
+  user            User              @relation(fields: [userId], references: [id])
   userEventTicket UserEventTicket[]
-  event          Event             @relation(fields: [eventId], references: [id])
+  event           Event             @relation(fields: [eventId], references: [id])
 
   @@map("users_events")
 }
